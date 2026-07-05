@@ -157,6 +157,13 @@ h1{font-size:clamp(42px,8vw,88px);font-weight:900;letter-spacing:-.045em;line-he
 .mini-bar{flex:1;height:5px;border-radius:10px;background:var(--track);overflow:hidden}
 .mini-fill{height:100%;width:0;border-radius:10px;background:var(--mc,#6d7cff);transition:width .6s cubic-bezier(.22,1,.36,1)}
 .mini-count{font-family:var(--mono);font-size:11px;color:var(--dim);white-space:nowrap}
+.open-btn{font-family:var(--font);font-size:11.5px;font-weight:700;letter-spacing:.01em;
+  color:var(--mc,#8fa0ff);background:var(--mc-bg,rgba(109,124,255,.12));
+  border:1px solid var(--mc-br,rgba(109,124,255,.3));padding:5px 10px;border-radius:8px;
+  text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;transition:.2s}
+.open-btn svg{transition:transform .2s}
+.open-btn:hover{background:var(--mc,#6d7cff);color:var(--check-ink);border-color:var(--mc,#6d7cff)}
+.open-btn:hover svg{transform:translateX(2px)}
 .chev{transition:.4s;color:var(--dim);flex:none;margin-top:2px}
 .mod.open .chev{transform:rotate(180deg)}
 
@@ -273,146 +280,12 @@ h1{font-size:clamp(42px,8vw,88px);font-weight:900;letter-spacing:-.045em;line-he
 
 <div class="toast" id="toast"><span class="emoji">🎓</span><span id="toastText">Module complete</span></div>
 
+<script src="data.js"></script>
 <script>
-const MODULES=[
-{n:"0",t:"Orientation & Mental Model",s:"The pipeline before the math",c:"#6d7cff",
- blurb:"Every LLM is: tokenize → pretrain → mid-train → post-train → align → evaluate → serve. Internalize the skeleton first; everything else hangs off it.",
- items:[
-  {t:"nanochat (Karpathy) - full stack in ~8K lines",note:"THE reference implementation. Tokenizer → pretrain → SFT → RL → eval → web UI for ~$100 on 8xH100. Clone it, read every file, run the speedrun.",links:[["GitHub","https://github.com/karpathy/nanochat"]]},
-  {t:"Neural Networks: Zero to Hero",note:"Watch 'Let's build GPT' and 'Let's build the GPT Tokenizer' with the code open.",links:[["Course","https://karpathy.ai/zero-to-hero.html"]]},
-  {t:"nanollama - raw text to GGUF in one command",note:"2026 spinoff showing a modern Llama-style stack end to end.",links:[["Discussion","https://github.com/karpathy/nanochat/discussions/557"]]},
- ],
- lex:["autoregressive","causal LM","next-token prediction","teacher forcing","cross-entropy","perplexity","bits-per-byte","context length","base vs instruct","foundation model","pretraining","post-training"]},
-
-{n:"1",t:"Tokenization",s:"The part everyone underrates",c:"#7d6dff",
- blurb:"Tokenization silently determines math ability, multilingual fairness, and effective context. Normal people skip this. Do not.",
- items:[
-  {t:"Let's build the GPT Tokenizer + minbpe",note:"Karpathy's video plus his minimal BPE repo.",links:[["Video","https://www.youtube.com/watch?v=zduSFxRajkE"],["minbpe","https://github.com/karpathy/minbpe"]]},
-  {t:"Neural Machine Translation of Rare Words with Subword Units",note:"Sennrich et al. 2016 - the original BPE idea.",links:[["arXiv 1508.07909","https://arxiv.org/abs/1508.07909"]]},
-  {t:"SentencePiece + Unigram LM tokenizer",note:"Kudo & Richardson 2018. Unigram is different from BPE and used by T5/Gemma.",links:[["arXiv 1808.06226","https://arxiv.org/abs/1808.06226"]]},
-  {t:"HuggingFace tokenizers library",note:"Production BBPE tooling.",links:[["GitHub","https://github.com/huggingface/tokenizers"]]},
- ],
- lex:["subword","merge rules","BPE","BBPE","WordPiece","Unigram LM","SentencePiece","pretokenizer regex","fertility","OOV","special tokens","chat template","glitch tokens","digit tokenization","tokenizer-free / BLT"]},
-
-{n:"2",t:"The Transformer, Modern Edition",s:"Not the 2017 vanilla one",c:"#9d6dff",
- blurb:"The modern default stack: pre-norm + RMSNorm, RoPE, SwiGLU, GQA, FlashAttention. Learn it directly, not the archaic version.",
- items:[
-  {t:"Attention Is All You Need",note:"Vaswani et al. 2017. Pair with The Illustrated Transformer + The Annotated Transformer.",links:[["arXiv 1706.03762","https://arxiv.org/abs/1706.03762"]]},
-  {t:"Crystallization of Transformer Architectures (2017-2025)",note:"Excellent survey of what converged and why.",links:[["Blog","https://jytan.net/blog/2025/transformer-architectures/"]]},
-  {t:"RMSNorm - Root Mean Square Layer Normalization",note:"Zhang & Sennrich 2019. Why pre-norm gives gradient stability at depth.",links:[["arXiv 1910.07467","https://arxiv.org/abs/1910.07467"]]},
-  {t:"RoFormer / RoPE",note:"Su et al. Rotation encodes relative position and enables YaRN context extension.",links:[["arXiv 2104.09864","https://arxiv.org/abs/2104.09864"],["YaRN","https://arxiv.org/abs/2309.00071"]]},
-  {t:"GLU Variants Improve Transformer (SwiGLU)",note:"Shazeer 2020. Note the 2/3 hidden-dim trick to match params.",links:[["arXiv 2002.05202","https://arxiv.org/abs/2002.05202"]]},
-  {t:"GQA - Grouped-Query Attention",note:"Ainslie et al. KV-cache memory play, generalizing MQA. Critical for inference.",links:[["arXiv 2305.13245","https://arxiv.org/abs/2305.13245"]]},
-  {t:"FlashAttention 1/2/3",note:"Dao et al. IO-awareness: it's about HBM<->SRAM traffic, not FLOPs.",links:[["arXiv 2205.14135","https://arxiv.org/abs/2205.14135"]]},
- ],
- lex:["pre-norm/post-norm","residual stream","attention head","Q/K/V","causal mask","RoPE","ALiBi","NoPE","YaRN","KV cache","MHA/MQA/GQA/MLA","IO-aware","SRAM/HBM","tied embeddings","logit","QK-norm","logit soft-capping","sliding-window","attention sinks"]},
-
-{n:"3",t:"Training Dynamics & Optimization",s:"Where models go to die",c:"#c06dff",
- blurb:"Loss spikes, learning-rate schedules, and how labs keep billion-param runs alive. muP is the tit-bit normal people miss.",
- items:[
-  {t:"Decoupled Weight Decay Regularization (AdamW)",note:"Loshchilov & Hutter. Still the default optimizer.",links:[["arXiv 1711.05101","https://arxiv.org/abs/1711.05101"]]},
-  {t:"muP / muTransfer (Tensor Programs V)",note:"Tune hyperparameters on a tiny model, transfer to the big one. Used by real labs.",links:[["arXiv 2203.03466","https://arxiv.org/abs/2203.03466"]]},
-  {t:"An Empirical Model of Large-Batch Training",note:"McCandlish et al. Critical batch size and gradient noise scale.",links:[["arXiv 1812.06162","https://arxiv.org/abs/1812.06162"]]},
-  {t:"Muon optimizer + WSD schedules",note:"Modern optimizers (Lion, Sophia, Adam-mini, Muon, SOAP) and Warmup-Stable-Decay eating cosine's lunch.",links:[["Muon","https://kellerjordan.github.io/posts/muon/"]]},
- ],
- lex:["AdamW","weight decay","warmup","cosine/WSD schedule","LR annealing","gradient clipping","grad norm","loss spike","z-loss","muP/muTransfer","coordinate check","critical batch size","gradient accumulation","EMA","bf16/fp8","loss scaling","optimizer states"]},
-
-{n:"4",t:"Scaling Laws & Compute-Optimality",s:"The intellectual core",c:"#dd6dd0",
- blurb:"How labs decide how big a model to train and on how much data. Memorize C ≈ 6ND.",
- items:[
-  {t:"Scaling Laws for Neural Language Models",note:"Kaplan et al. 2020. The original power laws.",links:[["arXiv 2001.08361","https://arxiv.org/abs/2001.08361"]]},
-  {t:"Training Compute-Optimal LLMs (Chinchilla)",note:"Hoffmann et al. The ~20 tokens/param rule that corrected Kaplan.",links:[["arXiv 2203.15556","https://arxiv.org/abs/2203.15556"],["Explainer","https://lifearchitect.ai/chinchilla/"]]},
-  {t:"Scaling Data-Constrained Language Models",note:"Muennighoff et al. ~4 epochs ≈ fresh data, then diminishing returns.",links:[["arXiv 2305.16264","https://arxiv.org/abs/2305.16264"]]},
-  {t:"Beyond Chinchilla-Optimal (inference-adjusted)",note:"Why deployed models are over-trained (smaller, more tokens). LFM2.5-350M hit 80,000:1.",links:[["Analysis","https://medium.com/@advaitss11/llm-scaling-laws-and-their-relevance-in-2026-b7928e732b6d"]]},
- ],
- lex:["power law","compute-optimal","isoFLOP","6ND","tokens-per-parameter","over-training","irreducible loss","scaling exponent","emergent abilities","grokking","double descent","inference-adjusted scaling"]},
-
-{n:"5",t:"Data: Curation, Dedup, Mixtures",s:"The real moat",c:"#ff6db6",
- blurb:"Frontier quality is 80% data. Least glamorous, most important. Mid-training / annealing is the phase most tutorials miss.",
- items:[
-  {t:"RefinedWeb",note:"Web data alone, filtered well, beats curated corpora.",links:[["arXiv 2306.01116","https://arxiv.org/abs/2306.01116"]]},
-  {t:"FineWeb & FineWeb-Edu blog",note:"A full data-engineering masterclass. Read it slowly.",links:[["Blog","https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1"]]},
-  {t:"DoReMi - Domain Reweighting with Minimax Optimization",note:"Learn data mixture weights with a small proxy model.",links:[["arXiv 2305.10429","https://arxiv.org/abs/2305.10429"]]},
-  {t:"Rephrasing the Web (WRAP)",note:"Synthetic / rephrased data. Pair with the Phi 'textbooks are all you need' line.",links:[["arXiv 2401.16380","https://arxiv.org/abs/2401.16380"]]},
- ],
- lex:["corpus","dedup (MinHash/LSH)","quality classifier","perplexity filter","DSIR","DoReMi","data mixture","domain weights","upsampling","decontamination","n-gram overlap","synthetic data","annealing/cooldown/mid-training","curriculum","replay","catastrophic forgetting","token budget"]},
-
-{n:"6",t:"Distributed Training & Systems",s:"The memory wall",c:"#ff7d6d",
- blurb:"Parallelism, the roofline model, and MFU - the one number labs quote for training efficiency.",
- items:[
-  {t:"Megatron-LM (tensor parallelism)",note:"Shoeybi et al. 2019.",links:[["arXiv 1909.08053","https://arxiv.org/abs/1909.08053"]]},
-  {t:"ZeRO / DeepSpeed",note:"Rajbhandari et al. Stages 1/2/3 sharding. FSDP is the PyTorch-native equivalent.",links:[["arXiv 1910.02054","https://arxiv.org/abs/1910.02054"]]},
-  {t:"Ring Attention (sequence/context parallel)",note:"For long context training.",links:[["arXiv 2310.01889","https://arxiv.org/abs/2310.01889"]]},
-  {t:"The Ultra-Scale Playbook",note:"HuggingFace 2025. Outstanding modern systems read. Pair with Google's 'How to Scale Your Model'.",links:[["Playbook","https://huggingface.co/spaces/nanotron/ultrascale-playbook"]]},
- ],
- lex:["DP/TP/PP/EP/SP/CP","3D/4D parallelism","ZeRO-1/2/3","FSDP","sharding","all-reduce/all-gather","NCCL","pipeline bubble","1F1B","micro-batch","activation checkpointing","rematerialization","offloading","MFU/HFU","arithmetic intensity","roofline","NVLink/InfiniBand"]},
-
-{n:"7",t:"Mixture-of-Experts",s:"Near-mandatory in 2026",c:"#ffa06d",
- blurb:"Every frontier model (DeepSeek-V3, Mixtral, Qwen3, Llama 4, GPT-oss) is MoE now. Active vs total params is the key intuition.",
- items:[
-  {t:"Switch Transformer",note:"Fedus et al. 2021. Pair with GShard.",links:[["arXiv 2101.03961","https://arxiv.org/abs/2101.03961"]]},
-  {t:"Mixtral of Experts",note:"2024. Clean, readable sparse MoE.",links:[["arXiv 2401.04088","https://arxiv.org/abs/2401.04088"]]},
-  {t:"DeepSeek-V3 Technical Report",note:"The most important single report of the era. Fine-grained + shared experts, aux-loss-free balancing, MLA, FP8. Read it twice.",links:[["arXiv 2412.19437","https://arxiv.org/abs/2412.19437"]]},
- ],
- lex:["sparse MoE","router/gating","top-k routing","active params","shared/fine-grained experts","load-balancing loss","aux-loss-free balancing","expert collapse","router z-loss","capacity factor","token dropping","expert parallel","upcycling"]},
-
-{n:"8",t:"Post-Training I: SFT",s:"Base model to assistant",c:"#ffc46d",
- blurb:"Instruction tuning, chat templates, loss masking, and PEFT. Quality beats quantity - LIMA showed 1K great examples.",
- items:[
-  {t:"InstructGPT",note:"Ouyang et al. The SFT→RM→PPO recipe that made ChatGPT. Required reading.",links:[["arXiv 2203.02155","https://arxiv.org/abs/2203.02155"]]},
-  {t:"Self-Instruct",note:"Bootstrapping instruction data. Pair with Alpaca.",links:[["arXiv 2212.10560","https://arxiv.org/abs/2212.10560"]]},
-  {t:"Tulu 3 (AllenAI)",note:"The best open, fully-documented post-training recipe.",links:[["arXiv 2411.15124","https://arxiv.org/abs/2411.15124"]]},
-  {t:"LoRA + QLoRA",note:"Parameter-efficient finetuning (PEFT).",links:[["LoRA","https://arxiv.org/abs/2106.09685"],["QLoRA","https://arxiv.org/abs/2305.14314"]]},
- ],
- lex:["SFT","instruction tuning","chat template","system prompt","loss masking","completion-only loss","sequence packing","LoRA/QLoRA/DoRA","PEFT","adapters","LIMA","alignment tax"]},
-
-{n:"9",t:"Post-Training II: RLHF, DPO & RLVR",s:"The reasoning-model era",c:"#e8d96d",
- blurb:"PPO → DPO → verifiable-reward RL. GRPO + RLVR (DeepSeek-R1) changed the field. KL-to-reference is the master knob.",
- items:[
-  {t:"PPO - Proximal Policy Optimization",note:"Schulman et al. Reward model, KL penalty, value head, GAE, reward hacking.",links:[["arXiv 1707.06347","https://arxiv.org/abs/1707.06347"]]},
-  {t:"DPO - Direct Preference Optimization",note:"Rafailov et al. RLHF without a separate RL loop. Then the zoo: IPO, KTO, ORPO, SimPO.",links:[["arXiv 2305.18290","https://arxiv.org/abs/2305.18290"]]},
-  {t:"Constitutional AI / RLAIF",note:"Anthropic. AI feedback instead of human labels.",links:[["arXiv 2212.08073","https://arxiv.org/abs/2212.08073"]]},
-  {t:"DeepSeek-R1 (GRPO + RLVR)",note:"Must-read. R1-Zero: pure RL, no SFT, emergent chain-of-thought. GRPO drops the value network.",links:[["arXiv 2501.12948","https://arxiv.org/abs/2501.12948"]]},
- ],
- lex:["RLHF","reward model","Bradley-Terry","PPO","GAE","KL penalty","reference policy","DPO/IPO/KTO/ORPO/SimPO","RLAIF","GRPO","RLVR","verifier","PRM/ORM","rejection sampling","STaR","best-of-N","reward hacking","over-optimization","entropy collapse","rollout","advantage"]},
-
-{n:"10",t:"Long Context, Inference & Serving",s:"Serve it cheaply",c:"#a0e86d",
- blurb:"Training isn't done until it serves. Quantization, speculative decoding, PagedAttention, and TTFT vs TPOT.",
- items:[
-  {t:"vLLM + PagedAttention",note:"Continuous batching, prefix caching, chunked prefill.",links:[["Paper","https://arxiv.org/abs/2309.06180"]]},
-  {t:"Quantization: GPTQ / AWQ / SmoothQuant",note:"PTQ vs QAT, GGUF/llama.cpp, NF4, FP8/INT4 inference.",links:[["GPTQ","https://arxiv.org/abs/2210.17323"],["AWQ","https://arxiv.org/abs/2306.00978"]]},
-  {t:"Speculative decoding + Medusa / EAGLE",note:"Draft model accelerates decode without changing outputs.",links:[["Spec decode","https://arxiv.org/abs/2211.17192"]]},
-  {t:"Distilling the Knowledge in a Neural Network",note:"Hinton et al. Plus on-policy distillation (2025) for small strong models.",links:[["arXiv 1503.02531","https://arxiv.org/abs/1503.02531"]]},
- ],
- lex:["prefill vs decode","TTFT/TPOT/ITL","continuous batching","PagedAttention","speculative decoding","draft model","Medusa/EAGLE","GPTQ/AWQ/GGUF/NF4","PTQ/QAT","throughput vs latency","prefix caching","needle-in-a-haystack","RULER","distillation"]},
-
-{n:"11",t:"Evaluation",s:"Where credibility is won or lost",c:"#6de8a0",
- blurb:"Prompt-format sensitivity can swing MMLU 5-10 points. Contamination inflates everything. You'll feel at home here.",
- items:[
-  {t:"lm-evaluation-harness",note:"The de facto eval tool. MMLU, GPQA, GSM8K, MATH, HumanEval, IFEval, BBH.",links:[["GitHub","https://github.com/EleutherAI/lm-evaluation-harness"]]},
-  {t:"HELM - Holistic Evaluation of Language Models",note:"Stanford's multi-metric framework.",links:[["arXiv 2211.09110","https://arxiv.org/abs/2211.09110"]]},
-  {t:"Judging LLM-as-a-Judge (MT-Bench + Chatbot Arena)",note:"Zheng et al. Elo ranking plus judge biases (position, verbosity, self-preference).",links:[["arXiv 2306.05685","https://arxiv.org/abs/2306.05685"]]},
-  {t:"Are Emergent Abilities a Mirage?",note:"Schaeffer et al. The metric-choice critique of emergence.",links:[["arXiv 2304.15004","https://arxiv.org/abs/2304.15004"]]},
- ],
- lex:["zero/few-shot","in-context learning","CoT prompting","self-consistency","pass@k","log-likelihood vs generative eval","contamination","saturation","Elo","LLM-as-judge","IFEval","elicitation gap","held-out"]},
-
-{n:"12",t:"Interpretability, Safety & Frontier",s:"Read any 2026 paper",c:"#6dc4ff",
- blurb:"Round out the vocabulary: mech interp, safety failure modes, and the emerging architectures worth name-dropping correctly.",
- items:[
-  {t:"Toward / Scaling Monosemanticity (Anthropic)",note:"Sparse autoencoders, features vs neurons, superposition, induction heads.",links:[["Article","https://transformer-circuits.pub/2024/scaling-monosemanticity/"]]},
-  {t:"Mamba - Linear-Time Sequence Modeling with SSMs",note:"State-space models, linear attention, hybrid (Jamba, Zamba) architectures.",links:[["arXiv 2312.00752","https://arxiv.org/abs/2312.00752"]]},
-  {t:"Byte Latent Transformer (BLT)",note:"Meta 2024. Tokenizer-free, byte-level, dynamic patching.",links:[["arXiv 2412.09871","https://arxiv.org/abs/2412.09871"]]},
-  {t:"Read one full tech report cover to cover",note:"Llama 3 (the 92-page one), DeepSeek-V3, OLMo 2/Tulu 3, or Qwen3. These reports ARE the modern curriculum.",links:[["Llama 3","https://arxiv.org/abs/2407.21783"],["Qwen3","https://arxiv.org/abs/2505.09388"]]},
- ],
- lex:["residual stream","induction heads","superposition","sparse autoencoders","monosemanticity","jailbreak","red-teaming","sycophancy","deceptive alignment","sandbagging","unlearning","Mamba/SSM","linear attention","hybrid models","diffusion LM","test-time compute","latent reasoning"]},
-];
-
 const KEY="llm-curriculum-progress-v1";
 let state=JSON.parse(localStorage.getItem(KEY)||"{}");
 const grid=document.getElementById("grid");
 let totalItems=0,totalLex=0;
-
-function idFor(m,i){return "m"+m.n+"i"+i}
 
 MODULES.forEach(m=>{
   totalItems+=m.items.length; totalLex+=m.lex.length;
@@ -430,6 +303,9 @@ MODULES.forEach(m=>{
        <div class="mod-meta">
          <div class="mini-bar"><div class="mini-fill"></div></div>
          <div class="mini-count"></div>
+         <a class="open-btn" href="module.html?m=${m.n}" onclick="event.stopPropagation()">Open
+           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+         </a>
        </div>
      </div>
      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>

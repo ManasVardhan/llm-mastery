@@ -5,6 +5,7 @@ An interactive, self-contained reading tracker for learning how to train a large
 ## Features
 
 - **13 modules** covering the full stack: tokenization, the modern Transformer, optimization, scaling laws, data, distributed training, MoE, SFT, RLHF/DPO/RLVR, inference, evaluation, and interpretability.
+- **Dedicated module pages**: every card has an **Open** button that leads to a full detail page describing the overview, what to study, what to do, resources, mastery checks, and lexicon for that module. Read-progress syncs with the home tracker.
 - **Mark-as-read checkboxes** on every resource, with a global progress bar and per-module progress.
 - **Progress persists** automatically via `localStorage`. Close the tab and come back where you left off.
 - **Light and dark mode**, toggled from the navbar and remembered across pages.
@@ -18,7 +19,9 @@ An interactive, self-contained reading tracker for learning how to train a large
 | File | Purpose |
 |------|---------|
 | `index.html` | The interactive module checklist (Home) |
+| `module.html` | Per-module detail page (`module.html?m=<n>`): overview, what to study, what to do, resources, mastery checks, lexicon |
 | `doc.html` | The full written curriculum (Doc) |
+| `data.js` | Shared curriculum data loaded by `index.html` and `module.html` |
 | `CURRICULUM.md` | The curriculum in raw Markdown |
 | `README.md` | This file |
 

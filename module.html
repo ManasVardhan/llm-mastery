@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Module · LLM Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>if(localStorage.getItem("llm-theme")==="light")document.documentElement.setAttribute("data-theme","light");</script>
+<style>
+:root{
+  --bg:#05060a;
+  --card:rgba(255,255,255,0.035);
+  --card-border:rgba(255,255,255,0.09);
+  --text:#e8eaf2;
+  --text-strong:#ffffff;
+  --muted:#8a90a6;
+  --dim:#5a5f74;
+  --accent:#6d7cff;
+  --accent2:#b06dff;
+  --good:#3ddc97;
+  --hover:rgba(255,255,255,.045);
+  --track:rgba(255,255,255,.06);
+  --grid:rgba(255,255,255,.035);
+  --glow:rgba(109,124,255,.20);
+  --check-ink:#05060a;
+  --topbar:rgba(5,6,10,.72);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f5fa;
+  --card:rgba(255,255,255,0.72);
+  --card-border:rgba(18,20,34,0.10);
+  --text:#1e2230;
+  --text-strong:#0a0c14;
+  --muted:#565b6e;
+  --dim:#9095a5;
+  --hover:rgba(18,20,34,.05);
+  --track:rgba(18,20,34,.08);
+  --grid:rgba(18,20,34,.05);
+  --glow:rgba(109,124,255,.16);
+  --check-ink:#ffffff;
+  --topbar:rgba(244,245,250,.78);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.65;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .45s,color .45s;
+}
+.bg{position:fixed;inset:0;z-index:-3;background:var(--bg);transition:background .45s}
+.bg-glow{position:fixed;inset:0;z-index:-2;pointer-events:none;transition:.45s;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -8%,var(--mglow,var(--glow)),transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 12%,rgba(176,109,255,.10),transparent 55%),
+    radial-gradient(ellipse 60% 50% at 12% 92%,rgba(61,220,151,.08),transparent 55%)}
+.bg-grid{position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%);
+  mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%)}
+.grain{position:fixed;inset:0;z-index:-1;opacity:.03;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);
+  background:var(--topbar);border-bottom:1px solid var(--card-border);transition:background .45s,border-color .45s}
+.topbar-inner{max-width:940px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;gap:18px}
+.tb-nav{display:flex;gap:3px;flex:1}
+.nav-link{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;
+  padding:7px 13px;border-radius:9px;transition:.2s;white-space:nowrap}
+.nav-link:hover{color:var(--text-strong);background:var(--hover)}
+.nav-link.active{color:var(--text-strong);background:var(--hover)}
+.tb-title{font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text-strong)}
+.tb-star{width:22px;height:22px;flex:none}
+.icon-btn{width:36px;height:34px;flex:none;display:grid;place-items:center;cursor:pointer;
+  background:var(--card);border:1px solid var(--card-border);border-radius:9px;color:var(--muted);transition:.25s}
+.icon-btn:hover{color:var(--text-strong);border-color:var(--accent)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn .moon{display:none}
+[data-theme="light"] .icon-btn .sun{display:none}
+[data-theme="light"] .icon-btn .moon{display:block}
+
+/* layout */
+.wrap{max-width:940px;margin:0 auto;padding:42px 26px 100px}
+.back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted);
+  text-decoration:none;margin-bottom:30px;transition:.2s}
+.back:hover{color:var(--text-strong);gap:10px}
+
+.m-head{display:flex;gap:20px;align-items:flex-start;margin-bottom:14px}
+.m-num{font-family:var(--mono);font-size:15px;font-weight:700;
+  width:58px;height:58px;flex:none;border-radius:16px;display:grid;place-items:center;
+  background:var(--mc-bg);color:var(--mc);border:1px solid var(--mc-br)}
+.m-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mc);font-weight:500;margin-bottom:8px}
+.m-title{font-size:clamp(30px,5vw,46px);font-weight:900;letter-spacing:-.03em;line-height:1.04;color:var(--text-strong)}
+.m-sub{font-size:16px;color:var(--muted);margin-top:8px}
+.m-blurb{font-size:15.5px;color:var(--text);border-left:3px solid var(--mc-br);
+  padding:6px 0 6px 18px;margin:26px 0 8px;font-style:italic}
+
+/* module progress */
+.m-prog{display:flex;align-items:center;gap:14px;margin:30px 0 8px}
+.m-bar{flex:1;height:8px;border-radius:20px;background:var(--track);overflow:hidden}
+.m-fill{height:100%;width:0;border-radius:20px;background:var(--mc);transition:width .7s cubic-bezier(.22,1,.36,1)}
+.m-count{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+
+section{margin-top:44px}
+.s-head{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.s-ico{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;
+  background:var(--mc-bg);color:var(--mc);border:1px solid var(--mc-br)}
+.s-ico svg{width:16px;height:16px}
+.s-title{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong)}
+
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:18px;
+  padding:22px 24px;backdrop-filter:blur(14px)}
+
+.overview{font-size:15.5px;color:var(--text);line-height:1.75}
+
+.list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.list li{position:relative;padding:11px 0 11px 30px;font-size:15px;color:var(--text);
+  border-bottom:1px solid var(--card-border)}
+.list li:last-child{border-bottom:none}
+.list li::before{content:'';position:absolute;left:4px;top:18px;width:8px;height:8px;border-radius:50%;
+  background:var(--mc);box-shadow:0 0 10px var(--mc-br)}
+.list.checklist li{padding-left:34px;cursor:pointer;transition:.2s;border-radius:8px;margin:0 -10px;padding-right:10px;padding-left:44px}
+.list.checklist li:hover{background:var(--hover)}
+.list.checklist li::before{display:none}
+.chk{position:absolute;left:10px;top:11px;width:20px;height:20px;border-radius:6px;
+  border:2px solid var(--dim);display:grid;place-items:center;transition:.25s}
+.chk svg{width:12px;height:12px;stroke:var(--check-ink);stroke-width:3.5;fill:none;
+  stroke-dasharray:20;stroke-dashoffset:20;transition:.3s .05s}
+.list.checklist li.done .chk{background:var(--good);border-color:var(--good);box-shadow:0 0 12px rgba(61,220,151,.5)}
+.list.checklist li.done .chk svg{stroke-dashoffset:0}
+.list.checklist li.done .r-title{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(61,220,151,.5)}
+
+/* resources */
+.res{display:flex;flex-direction:column;gap:10px}
+.r{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:14px;
+  background:var(--card);border:1px solid var(--card-border);cursor:pointer;transition:.2s}
+.r:hover{border-color:var(--mc-br);background:var(--hover)}
+.r-cbox{width:22px;height:22px;flex:none;border-radius:7px;border:2px solid var(--dim);
+  margin-top:1px;display:grid;place-items:center;transition:.25s}
+.r-cbox svg{width:13px;height:13px;stroke:var(--check-ink);stroke-width:3.5;fill:none;
+  stroke-dasharray:20;stroke-dashoffset:20;transition:.3s .05s}
+.r.done .r-cbox{background:var(--good);border-color:var(--good);box-shadow:0 0 14px rgba(61,220,151,.5)}
+.r.done .r-cbox svg{stroke-dashoffset:0}
+.r-body{flex:1;min-width:0}
+.r-title{font-size:15.5px;font-weight:700;line-height:1.4;transition:.25s}
+.r.done .r-title{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(61,220,151,.5)}
+.r-note{font-size:13.5px;color:var(--muted);margin-top:5px;line-height:1.55}
+.r-links{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.lnk{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--mc);
+  background:var(--mc-bg);border:1px solid var(--mc-br);padding:5px 10px;border-radius:8px;
+  text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:5px}
+.lnk:hover{background:var(--mc);color:var(--check-ink);border-color:var(--mc)}
+
+/* lexicon */
+.lex-tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--hover);
+  border:1px solid var(--card-border);padding:5px 11px;border-radius:8px;transition:.2s}
+.tag:hover{color:var(--text-strong);border-color:var(--mc);background:var(--mc-bg)}
+
+/* prev/next */
+.nav-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:56px}
+.nav-card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;
+  padding:18px 20px;text-decoration:none;transition:.25s;backdrop-filter:blur(10px)}
+.nav-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.nav-card.next{text-align:right}
+.nav-card.disabled{opacity:.35;pointer-events:none}
+.nc-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.nc-title{font-size:15px;font-weight:700;color:var(--text-strong);line-height:1.3}
+
+.notfound{text-align:center;padding:120px 20px;color:var(--muted)}
+.notfound a{color:var(--accent)}
+
+@media(max-width:640px){
+  .wrap{padding:32px 16px 80px}
+  .topbar-inner{padding:12px 16px;gap:10px}
+  .tb-title span.full{display:none}
+  .nav-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+<div class="grain"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="tb-title">
+      <svg class="tb-star" viewBox="0 0 24 24" fill="url(#g)"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d7cff"/><stop offset="1" stop-color="#b06dff"/></linearGradient></defs><path d="M12 2l2.9 6.9L22 9.6l-5.3 4.7L18.2 22 12 18.2 5.8 22l1.5-7.7L2 9.6l7.1-.7z"/></svg>
+      <span class="full">LLM Mastery</span>
+    </a>
+    <nav class="tb-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="doc.html" class="nav-link">Doc</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<script src="data.js"></script>
+<script>
+const KEY="llm-curriculum-progress-v1";
+let state=JSON.parse(localStorage.getItem(KEY)||"{}");
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function hex(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+const params=new URLSearchParams(location.search);
+const mn=params.get("m");
+const idx=MODULES.findIndex(x=>x.n===mn);
+const wrap=document.getElementById("wrap");
+
+if(idx<0){
+  wrap.innerHTML=`<div class="notfound">Module not found. <a href="index.html">Back to all modules</a></div>`;
+}else{
+  const m=MODULES[idx];
+  document.title=`Module ${m.n}: ${m.t} · LLM Mastery`;
+  document.documentElement.style.setProperty("--mc",m.c);
+  document.documentElement.style.setProperty("--mc-bg",hex(m.c,.14));
+  document.documentElement.style.setProperty("--mc-br",hex(m.c,.34));
+  document.documentElement.style.setProperty("--mglow",hex(m.c,.16));
+
+  const chk=`<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
+  const arrow=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>`;
+  const ic=n=>`<span class="s-ico">${n}</span>`;
+  const iBook=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`;
+  const iDo=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>`;
+  const iRes=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`;
+  const iCheck=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>`;
+  const iLex=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>`;
+
+  const overview=m.overview?`
+    <section>
+      <div class="s-head">${ic(iBook)}<div class="s-title">Overview</div></div>
+      <div class="card"><p class="overview">${esc(m.overview)}</p></div>
+    </section>`:"";
+
+  const study=(m.study&&m.study.length)?`
+    <section>
+      <div class="s-head">${ic(iBook)}<div class="s-title">What to study</div></div>
+      <div class="card"><ul class="list">${m.study.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    </section>`:"";
+
+  const doit=(m.doit&&m.doit.length)?`
+    <section>
+      <div class="s-head">${ic(iDo)}<div class="s-title">What to do</div></div>
+      <div class="card"><ul class="list">${m.doit.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    </section>`:"";
+
+  const resources=`
+    <section>
+      <div class="s-head">${ic(iRes)}<div class="s-title">Resources</div></div>
+      <div class="res">
+        ${m.items.map((it,i)=>`
+          <div class="r" data-id="${idFor(m,i)}">
+            <div class="r-cbox">${chk}</div>
+            <div class="r-body">
+              <div class="r-title">${esc(it.t)}</div>
+              ${it.note?`<div class="r-note">${esc(it.note)}</div>`:""}
+              ${it.links?`<div class="r-links">${it.links.map(l=>`<a class="lnk" href="${l[1]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#8599; ${esc(l[0])}</a>`).join("")}</div>`:""}
+            </div>
+          </div>`).join("")}
+      </div>
+    </section>`;
+
+  const mastery=(m.mastery&&m.mastery.length)?`
+    <section>
+      <div class="s-head">${ic(iCheck)}<div class="s-title">Mastery check</div></div>
+      <div class="card"><ul class="list">${m.mastery.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    </section>`:"";
+
+  const lex=`
+    <section>
+      <div class="s-head">${ic(iLex)}<div class="s-title">Lexicon &middot; speak like a researcher</div></div>
+      <div class="card"><div class="lex-tags">${m.lex.map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div></div>
+    </section>`;
+
+  const prev=idx>0?MODULES[idx-1]:null;
+  const next=idx<MODULES.length-1?MODULES[idx+1]:null;
+  const nav=`
+    <div class="nav-cards">
+      ${prev?`<a class="nav-card prev" href="module.html?m=${prev.n}"><div class="nc-label">&larr; Module ${prev.n}</div><div class="nc-title">${esc(prev.t)}</div></a>`:`<span class="nav-card prev disabled"><div class="nc-label">Start</div><div class="nc-title">You're at the beginning</div></span>`}
+      ${next?`<a class="nav-card next" href="module.html?m=${next.n}"><div class="nc-label">Module ${next.n} &rarr;</div><div class="nc-title">${esc(next.t)}</div></a>`:`<span class="nav-card next disabled"><div class="nc-label">End</div><div class="nc-title">Final module</div></span>`}
+    </div>`;
+
+  wrap.innerHTML=`
+    <a class="back" href="index.html">${arrow} All modules</a>
+    <div class="m-head">
+      <div class="m-num">${m.n}</div>
+      <div>
+        <div class="m-eyebrow">Module ${m.n}</div>
+        <h1 class="m-title">${esc(m.t)}</h1>
+        <div class="m-sub">${esc(m.s)}</div>
+      </div>
+    </div>
+    <div class="m-blurb">${esc(m.blurb)}</div>
+    <div class="m-prog">
+      <div class="m-bar"><div class="m-fill" id="mFill"></div></div>
+      <div class="m-count" id="mCount"></div>
+    </div>
+    ${overview}${study}${doit}${resources}${mastery}${lex}${nav}`;
+
+  function refresh(){
+    const total=m.items.length;
+    let done=0;m.items.forEach((_,i)=>{if(state[idFor(m,i)])done++});
+    document.getElementById("mFill").style.width=(total?done/total*100:0)+"%";
+    document.getElementById("mCount").textContent=done+" / "+total+" read";
+  }
+  wrap.querySelectorAll(".r").forEach(el=>{
+    const id=el.dataset.id;
+    if(state[id])el.classList.add("done");
+    el.addEventListener("click",()=>{
+      el.classList.toggle("done");
+      state[id]=el.classList.contains("done");
+      save();refresh();
+    });
+  });
+  refresh();
+}
+
+// theme toggle
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  const isLight=document.documentElement.getAttribute("data-theme")==="light";
+  if(isLight){document.documentElement.removeAttribute("data-theme");localStorage.setItem("llm-theme","dark");}
+  else{document.documentElement.setAttribute("data-theme","light");localStorage.setItem("llm-theme","light");}
+});
+</script>
+</body>
+</html>
