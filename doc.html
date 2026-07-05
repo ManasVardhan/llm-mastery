@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doc · LLM Mastery Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>if(localStorage.getItem("llm-theme")==="light")document.documentElement.setAttribute("data-theme","light");</script>
+<style>
+:root{
+  --bg:#05060a;--card:rgba(255,255,255,0.035);--card-border:rgba(255,255,255,0.09);
+  --text:#c9cddb;--text-strong:#ffffff;--muted:#8a90a6;--dim:#5a5f74;
+  --accent:#6d7cff;--accent2:#b06dff;--good:#3ddc97;
+  --hover:rgba(255,255,255,.045);--track:rgba(255,255,255,.06);--grid:rgba(255,255,255,.035);
+  --glow:rgba(109,124,255,.20);--topbar:rgba(5,6,10,.72);--codebg:rgba(255,255,255,.06);
+  --font:'Inter',system-ui,-apple-system,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f5fa;--card:rgba(255,255,255,0.72);--card-border:rgba(18,20,34,0.10);
+  --text:#2b3040;--text-strong:#0a0c14;--muted:#565b6e;--dim:#9095a5;
+  --hover:rgba(18,20,34,.05);--track:rgba(18,20,34,.08);--grid:rgba(18,20,34,.05);
+  --glow:rgba(109,124,255,.16);--topbar:rgba(244,245,250,.78);--codebg:rgba(18,20,34,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.7;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .45s,color .45s}
+.bg{position:fixed;inset:0;z-index:-3;background:var(--bg);transition:background .45s}
+.bg-glow{position:fixed;inset:0;z-index:-2;pointer-events:none;transition:.45s;
+  background:radial-gradient(ellipse 90% 55% at 50% -8%,var(--glow),transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 12%,rgba(176,109,255,.10),transparent 55%)}
+.bg-grid{position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%);
+  mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%)}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);background:var(--topbar);
+  border-bottom:1px solid var(--card-border);transition:background .45s,border-color .45s}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;gap:18px}
+.tb-title{font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:9px}
+.tb-star{width:22px;height:22px;flex:none}
+.tb-nav{display:flex;gap:3px;flex:1}
+.nav-link{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:7px 13px;border-radius:9px;transition:.2s;white-space:nowrap}
+.nav-link:hover{color:var(--text-strong);background:var(--hover)}
+.nav-link.active{color:var(--text-strong);background:var(--hover)}
+.icon-btn{width:36px;height:34px;flex:none;display:grid;place-items:center;cursor:pointer;
+  background:var(--card);border:1px solid var(--card-border);border-radius:9px;color:var(--muted);transition:.25s}
+.icon-btn:hover{color:var(--text-strong);border-color:var(--accent)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn .moon{display:none}
+[data-theme="light"] .icon-btn .sun{display:none}
+[data-theme="light"] .icon-btn .moon{display:block}
+
+.wrap{max-width:820px;margin:0 auto;padding:56px 26px 110px}
+.reading-note{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.05em;
+  border:1px solid var(--card-border);background:var(--card);border-radius:12px;padding:12px 16px;margin-bottom:44px;backdrop-filter:blur(10px)}
+.prose h1{font-size:clamp(34px,6vw,54px);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin:0 0 8px;
+  background:linear-gradient(180deg,#fff 30%,#9aa0c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme="light"] .prose h1{background:linear-gradient(180deg,#0a0c14 30%,#454b66);-webkit-background-clip:text;background-clip:text}
+.prose h2{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong);margin:52px 0 14px;
+  padding-top:16px;scroll-margin-top:80px}
+.prose h3{font-size:18px;font-weight:700;color:var(--text-strong);margin:30px 0 10px}
+.prose p{margin:14px 0;color:var(--text)}
+.prose strong{color:var(--text-strong);font-weight:700}
+.prose em{color:var(--muted)}
+.prose a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:.2s;word-break:break-word}
+.prose a:hover{border-bottom-color:var(--accent)}
+.prose ul,.prose ol{margin:14px 0;padding-left:24px}
+.prose li{margin:8px 0}
+.prose li::marker{color:var(--accent)}
+.prose code{font-family:var(--mono);font-size:.86em;background:var(--codebg);border:1px solid var(--card-border);
+  padding:2px 6px;border-radius:6px;color:var(--text-strong)}
+.prose hr{border:none;height:1px;background:var(--card-border);margin:48px 0}
+.prose blockquote{border-left:3px solid var(--accent);padding-left:16px;margin:18px 0;color:var(--muted);font-style:italic}
+.backtop{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:var(--card);border:1px solid var(--card-border);color:var(--muted);cursor:pointer;
+  backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:.3s;text-decoration:none}
+.backtop.show{opacity:1;pointer-events:auto}
+.backtop:hover{color:var(--text-strong);border-color:var(--accent)}
+@media(max-width:600px){.tb-title span.full{display:none}.topbar-inner{padding:12px 16px;gap:10px}}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="bg-glow"></div><div class="bg-grid"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="tb-title">
+      <svg class="tb-star" viewBox="0 0 24 24" fill="url(#g)"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d7cff"/><stop offset="1" stop-color="#b06dff"/></linearGradient></defs><path d="M12 2l2.9 6.9L22 9.6l-5.3 4.7L18.2 22 12 18.2 5.8 22l1.5-7.7L2 9.6l7.1-.7z"/></svg>
+      <span class="full">LLM Mastery</span>
+    </div>
+    <nav class="tb-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="doc.html" class="nav-link active">Doc</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="reading-note">The full written curriculum. The interactive checklist lives on the Home tab.</div>
+  <div class="prose" id="content"></div>
+</div>
+
+<a href="#" class="backtop" id="backtop" aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</a>
+
+<script id="md" type="text/plain">
+# Train an LLM From Scratch: The 0 to 100 Curriculum
+
+The syllabus you would hand a strong grad student who wants to go from zero to building and understanding a full LLM training stack. It is organized as a progression. Each module has the *why*, the canonical papers, hands-on resources, and the **lexicon** (the words researchers actually use in Slack and in paper reviews). Read in order, but the lexicon sections you can skim ahead for vocabulary.
+
+---
+
+## Module 0: Orientation and Mental Model
+
+Before any math, internalize the pipeline. Every LLM is: **tokenize, pretrain (next-token prediction), mid-train, post-train (SFT + RLHF/RLVR), align, evaluate, serve**. Everything else is detail hanging off this skeleton.
+
+**Do this first (single best 0-100 hands-on artifact):**
+- **Karpathy's [nanochat](https://github.com/karpathy/nanochat)**: 8K lines, the entire stack (tokenizer, pretrain, SFT, RL, eval, web UI) for about $100 on an 8xH100 node. This is *the* reference implementation to read end to end. Clone it, read every file, run the speedrun.
+- Karpathy's **[Neural Networks: Zero to Hero](https://karpathy.ai/zero-to-hero.html)** YouTube series, especially "Let's build GPT" and "Let's build the GPT Tokenizer." Watch with the code open.
+- **[nanollama](https://github.com/karpathy/nanochat/discussions/557)**: 2026 spinoff, raw text to Llama 3 to GGUF in one command. Good for seeing a modern Llama-style stack.
+
+**Lexicon:** autoregressive, causal LM, next-token prediction, teacher forcing, cross-entropy loss, perplexity (ppl = exp(loss)), bits-per-byte (BPB), token, context length, base model vs instruct model, foundation model, pretraining vs post-training.
+
+---
+
+## Module 1: Tokenization (the part everyone underrates)
+
+Tokenization silently determines your model's math ability, multilingual fairness, and effective context. "Normal people" skip this. Do not.
+
+**Read/watch:**
+- Karpathy, "Let's build the GPT Tokenizer" (video plus the `minbpe` repo).
+- Sennrich et al., BPE for NMT (2016), the original subword idea: [arxiv 1508.07909](https://arxiv.org/abs/1508.07909).
+- SentencePiece (Kudo and Richardson, 2018): [arxiv 1808.06226](https://arxiv.org/abs/1808.06226), and the Unigram LM tokenizer (Kudo 2018) which is *different* from BPE and used by T5/Gemma.
+- HuggingFace [tokenizers](https://github.com/huggingface/tokenizers) library docs.
+
+**Tit-bits that bite people:**
+- **Byte-level BPE (BBPE)** vs char-level: modern models work over UTF-8 bytes so nothing is ever OOV.
+- **Pretokenization regex** controls whether numbers, contractions, and whitespace merge sanely. Get this wrong and arithmetic dies.
+- **Digit tokenization**: left-to-right vs right-to-left grouping massively affects arithmetic. Llama 3 splits digits individually.
+- **Glitch tokens** (SolidGoldMagikarp): tokens in vocab but almost never in training data cause bizarre behavior.
+- **Fertility** (tokens per word): high fertility on a language means it is taxed on context and cost.
+- **Vocabulary size tradeoff**: bigger vocab means shorter sequences but fatter embedding/softmax matrices and rarer tokens undertrained.
+
+**Lexicon:** subword, merge rules, vocab, BPE/BBPE, WordPiece, Unigram LM, SentencePiece, pretokenizer, fertility, OOV, special tokens, chat template, tokenizer-free / byte-latent (BLT).
+
+---
+
+## Module 2: The Transformer, Modern Edition
+
+The 2017 vanilla Transformer is *not* what people train now. Learn the modern stack directly.
+
+**Foundational:**
+- Vaswani et al., "Attention Is All You Need" (2017): [arxiv 1706.03762](https://arxiv.org/abs/1706.03762).
+- The Illustrated Transformer (Jay Alammar) and The Annotated Transformer (Harvard).
+- Jun Yu Tan, ["The Crystallization of Transformer Architectures (2017-2025)"](https://jytan.net/blog/2025/transformer-architectures/).
+
+**The modern default stack (memorize these five):**
+1. **Pre-norm + RMSNorm**: Zhang and Sennrich (2019): [arxiv 1910.07467](https://arxiv.org/abs/1910.07467).
+2. **RoPE**: Su et al.: [arxiv 2104.09864](https://arxiv.org/abs/2104.09864). Enables NTK-aware / YaRN context extension ([YaRN](https://arxiv.org/abs/2309.00071)).
+3. **SwiGLU**: Shazeer: [arxiv 2002.05202](https://arxiv.org/abs/2002.05202). Note the 2/3 hidden-dim trick.
+4. **GQA**: Ainslie et al.: [arxiv 2305.13245](https://arxiv.org/abs/2305.13245), generalizing MQA. A KV-cache memory play.
+5. **Bias-free linear layers plus tied or untied embeddings**.
+
+**Attention efficiency:**
+- **FlashAttention** (Dao et al. 2022): [arxiv 2205.14135](https://arxiv.org/abs/2205.14135), plus v2 and v3. IO-awareness: it is about HBM to SRAM traffic, not FLOPs.
+- KV cache, PagedAttention (vLLM), sliding-window attention (Mistral), attention sinks / StreamingLLM.
+
+**Lexicon:** pre-norm/post-norm, residual stream, Q/K/V, causal mask, RoPE, ALiBi, NoPE, YaRN, KV cache, MHA/MQA/GQA/MLA, IO-aware, SRAM/HBM, tied embeddings, logit, QK-norm, logit soft-capping.
+
+---
+
+## Module 3: Training Dynamics, Optimization and Init
+
+Where models go to die (loss spikes) and how people keep them alive.
+
+**Read:**
+- AdamW (Loshchilov and Hutter): [arxiv 1711.05101](https://arxiv.org/abs/1711.05101), decoupled weight decay, still the default.
+- muP / muTransfer (Yang et al., "Tensor Programs V"): [arxiv 2203.03466](https://arxiv.org/abs/2203.03466). Tune hyperparameters on a tiny model, transfer to the big one. A genuine tit-bit normal people miss.
+- Cosine LR schedule plus linear warmup, and why WSD (Warmup-Stable-Decay) schedules are eating cosine's lunch.
+- Gradient clipping, z-loss, loss spikes and mitigation.
+- Newer optimizers: Lion, Sophia, Adam-mini, Muon, Shampoo/SOAP.
+- Mixed precision: bf16 vs fp16 (bf16 won), fp8 training, loss scaling, master weights.
+
+**Tit-bits:** critical batch size (McCandlish et al.); warmup length matters more than people think; weight decay interacts with the LR schedule; QK-norm and z-loss are cheap insurance against spikes.
+
+**Lexicon:** AdamW, weight decay, warmup, cosine/WSD schedule, LR annealing, gradient clipping, grad norm, loss spike, z-loss, muP/muTransfer, coordinate check, critical batch size, gradient accumulation, bf16/fp8, loss scaling, optimizer states.
+
+---
+
+## Module 4: Scaling Laws and Compute-Optimality
+
+This is the intellectual core. It is how labs *decide* how big a model to train and on how much data.
+
+**Read in this order:**
+- Kaplan et al., "Scaling Laws for Neural Language Models" (2020): [arxiv 2001.08361](https://arxiv.org/abs/2001.08361).
+- Hoffmann et al., Chinchilla (2022): [arxiv 2203.15556](https://arxiv.org/abs/2203.15556), the about 20 tokens/param rule. [Explainer](https://lifearchitect.ai/chinchilla/).
+- "Beyond Chinchilla-Optimal": folds inference cost into the objective. Why deployed models are over-trained.
+- **C is about 6ND**: memorize this. Compute is about 6 x params x tokens.
+- Muennighoff et al., "Scaling Data-Constrained Language Models": [arxiv 2305.16264](https://arxiv.org/abs/2305.16264).
+
+**Tit-bits:** the Kaplan-vs-Chinchilla discrepancy was partly a warmup/LR-schedule artifact. Also isoFLOP curves, the irreducible loss term, and emergence vs smooth scaling.
+
+**Lexicon:** power law, compute-optimal, isoFLOP, 6ND, tokens-per-parameter, over-training, irreducible loss, scaling exponent, emergent abilities, grokking, double descent, inference-adjusted scaling.
+
+---
+
+## Module 5: Data: Curation, Dedup, Mixtures (the real moat)
+
+Frontier quality is 80% data. The least-glamorous and most-important module.
+
+**Read:**
+- The Pile, RefinedWeb ([arxiv 2306.01116](https://arxiv.org/abs/2306.01116)), Dolma, FineWeb and FineWeb-Edu ([FineWeb blog](https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1), a full data-engineering masterclass).
+- Deduplication: "Deduplicating Training Data Makes LMs Better", MinHash / LSH, exact vs fuzzy.
+- Quality filtering: classifier-based, perplexity filtering, DSIR, DoReMi ([arxiv 2305.10429](https://arxiv.org/abs/2305.10429)).
+- Synthetic data: "Rephrasing the Web (WRAP)" ([arxiv 2401.16380](https://arxiv.org/abs/2401.16380)), the Phi textbooks line, Cosmopedia.
+- Decontamination against eval sets (n-gram overlap).
+
+**Tit-bits:** data mixture weights are a top-tier lever; annealing on high-quality data at the end of pretraining (the mid-training / cooldown phase, huge in 2024-2026, most tutorials miss it); upsampling code improves reasoning even for non-code tasks.
+
+**Lexicon:** corpus, dedup (MinHash/LSH), quality classifier, perplexity filter, DSIR, DoReMi, data mixture, domain weights, upsampling, decontamination, n-gram overlap, synthetic data, annealing/cooldown/mid-training, curriculum learning, replay, catastrophic forgetting, token budget.
+
+---
+
+## Module 6: Distributed Training and Systems
+
+To train at scale you must understand parallelism and the memory wall.
+
+**Read:**
+- Megatron-LM (Shoeybi et al. 2019): [arxiv 1909.08053](https://arxiv.org/abs/1909.08053), tensor parallelism.
+- ZeRO / DeepSpeed: [arxiv 1910.02054](https://arxiv.org/abs/1910.02054). FSDP is the PyTorch-native equivalent.
+- GPipe / PipeDream: pipeline parallelism, bubbles, 1F1B scheduling.
+- Ring Attention: [arxiv 2310.01889](https://arxiv.org/abs/2310.01889) for long context.
+- The Ultra-Scale Playbook (HuggingFace 2025) and "How to Scale Your Model" (JAX/Google).
+- Activation checkpointing, CPU/NVMe offload, overlap of compute and communication, NCCL collectives.
+- Hardware fluency: HBM bandwidth, arithmetic intensity, the roofline model, MFU (aim for 40-55%).
+
+**Lexicon:** DP/TP/PP/EP/SP/CP, 3D/4D parallelism, ZeRO-1/2/3, FSDP, sharding, all-reduce/all-gather, NCCL, pipeline bubble, 1F1B, micro-batch, activation checkpointing, offloading, MFU/HFU, arithmetic intensity, roofline, NVLink/InfiniBand.
+
+---
+
+## Module 7: Mixture-of-Experts (near-mandatory in 2026)
+
+Every frontier model (DeepSeek-V3, Mixtral, Qwen3, Llama 4, GPT-oss) is MoE now.
+
+**Read:**
+- Switch Transformer (Fedus et al. 2021): [arxiv 2101.03961](https://arxiv.org/abs/2101.03961) and GShard.
+- Mixtral of Experts (2024): [arxiv 2401.04088](https://arxiv.org/abs/2401.04088).
+- DeepSeek-V3 ([arxiv 2412.19437](https://arxiv.org/abs/2412.19437)): fine-grained plus shared experts, aux-loss-free load balancing, MLA, FP8. The most important single report of the era. Read it twice.
+
+**Tit-bits:** top-k routing, load-balancing loss vs aux-loss-free balancing, expert collapse, router z-loss, capacity factor and token dropping, active vs total params (a 671B MoE runs like an about 37B dense model), upcycling dense to MoE.
+
+**Lexicon:** sparse MoE, router/gating, top-k, active params, shared/fine-grained experts, load balancing, capacity factor, token dropping, expert parallel, upcycling, dense-vs-sparse.
+
+---
+
+## Module 8: Post-Training I: SFT and Instruction Tuning
+
+Base model to helpful assistant.
+
+**Read:**
+- InstructGPT (Ouyang et al. 2022): [arxiv 2203.02155](https://arxiv.org/abs/2203.02155), the SFT to RM to PPO recipe that made ChatGPT. Required reading.
+- FLAN, Self-Instruct ([arxiv 2212.10560](https://arxiv.org/abs/2212.10560)), Alpaca, Tulu 3 (AllenAI, the best open documented recipe: [arxiv 2411.15124](https://arxiv.org/abs/2411.15124)).
+- Chat templates, loss masking on prompt tokens, packing vs padding, multi-turn masking.
+- LoRA ([arxiv 2106.09685](https://arxiv.org/abs/2106.09685)) and QLoRA ([arxiv 2305.14314](https://arxiv.org/abs/2305.14314)), parameter-efficient finetuning.
+
+**Tit-bits:** quality beats quantity for SFT (LIMA, 1K great examples); prompt-token loss masking is a silent bug source; chat template mismatch between train and inference is the number one finetuning failure.
+
+**Lexicon:** SFT, instruction tuning, chat template, system prompt, loss masking, completion-only loss, packing, LoRA/QLoRA/DoRA, PEFT, adapters, catastrophic forgetting, alignment tax.
+
+---
+
+## Module 9: Post-Training II: RLHF, DPO and RLVR
+
+The 2022 to 2026 arc: PPO to DPO to verifiable-reward RL (the reasoning-model era).
+
+**Read:**
+- PPO (Schulman et al.): [arxiv 1707.06347](https://arxiv.org/abs/1707.06347). Reward model, KL penalty to reference, value head, GAE, reward hacking.
+- DPO (Rafailov et al. 2023): [arxiv 2305.18290](https://arxiv.org/abs/2305.18290), RLHF without a separate RL loop. Then IPO, KTO, ORPO, SimPO.
+- RLAIF / Constitutional AI (Anthropic): [arxiv 2212.08073](https://arxiv.org/abs/2212.08073).
+- DeepSeek-R1 ([arxiv 2501.12948](https://arxiv.org/abs/2501.12948)): GRPO, RLVR, R1-Zero (pure RL, no SFT, emergent CoT). This changed the field.
+- Follow-ons: PPO vs GRPO vs RLOO, PRM vs ORM, rejection sampling / STaR / best-of-N, verifier design, entropy collapse.
+
+**Tit-bits:** the KL-to-reference coefficient is the master knob; reward over-optimization; GRPO drops the value network and normalizes advantage within a sampled group; RLVR only works where you can *check* the answer (math, code, formal).
+
+**Lexicon:** RLHF, reward model, Bradley-Terry, PPO, GAE, KL penalty, reference policy, DPO/IPO/KTO/ORPO/SimPO, RLAIF, GRPO, RLVR, verifier, PRM/ORM, rejection sampling, STaR, best-of-N, reward hacking, over-optimization, entropy collapse, rollout, advantage.
+
+---
+
+## Module 10: Long Context, Inference and Serving
+
+Training is not done until it serves cheaply.
+
+**Read:**
+- Context extension: RoPE scaling, YaRN, Position Interpolation, ring attention; needle-in-a-haystack and RULER.
+- Quantization: GPTQ, AWQ, SmoothQuant, NF4, GGUF/llama.cpp, FP8/INT4; QAT vs PTQ.
+- Inference systems: vLLM plus PagedAttention, continuous batching, speculative decoding (draft model / Medusa / EAGLE), prefix caching, chunked prefill, TTFT vs TPOT/ITL.
+- Distillation: knowledge distillation (Hinton), sequence-level KD, on-policy distillation.
+
+**Lexicon:** KV cache, prefill vs decode, TTFT/TPOT/ITL, continuous batching, PagedAttention, speculative decoding, draft model, Medusa/EAGLE, GPTQ/AWQ/GGUF/NF4, PTQ/QAT, throughput vs latency, prefix caching, needle-in-a-haystack, RULER, distillation.
+
+---
+
+## Module 11: Evaluation (where credibility is won or lost)
+
+**Read:**
+- HELM (Stanford), lm-evaluation-harness (the de facto tool), MMLU / MMLU-Pro / GPQA / BBH / GSM8K / MATH / HumanEval+ / MBPP / IFEval / MT-Bench.
+- LMSYS Chatbot Arena plus Elo / Bradley-Terry ranking, and its style/length confounds.
+- LLM-as-a-judge (Zheng et al.), and its biases (position, verbosity, self-preference).
+
+**Tit-bits normal people miss:** prompt-format sensitivity can swing MMLU by 5-10 points; contamination inflates everything; benchmark saturation; elicitation gap.
+
+**Lexicon:** zero/few-shot, in-context learning, CoT prompting, self-consistency, pass@k, log-likelihood vs generative eval, contamination, saturation, Elo, LLM-as-judge, IFEval, held-out.
+
+---
+
+## Module 12: Interpretability, Safety and the Frontier Lexicon
+
+Round out your vocabulary so you can read *any* 2026 paper.
+
+- Mechanistic interpretability: residual stream, induction heads, superposition, sparse autoencoders (SAEs), features vs neurons (Anthropic's "Toward Monosemanticity," "Scaling Monosemanticity").
+- Safety/alignment: jailbreaks, red-teaming, sycophancy, deceptive alignment, sandbagging, reward hacking, refusal training, unlearning.
+- Emerging architectures: Mamba / SSMs, linear attention, hybrid models (Jamba, Zamba), Byte Latent Transformer (BLT), diffusion LMs, test-time compute, latent reasoning.
+
+---
+
+## The How-Do-I-Actually-Do-It Track
+
+1. nanochat end-to-end (Module 0).
+2. Sebastian Raschka, "Build a Large Language Model (From Scratch)" (book plus [repo](https://github.com/rasbt/LLMs-from-scratch)). Pair with his [Ahead of AI](https://magazine.sebastianraschka.com/) newsletter.
+3. HuggingFace [LLM Course](https://huggingface.co/learn/llm-course) plus [Ultra-Scale Playbook](https://huggingface.co/spaces/nanotron/ultrascale-playbook).
+4. Read one full technical report cover-to-cover: DeepSeek-V3, Llama 3 ([arxiv 2407.21783](https://arxiv.org/abs/2407.21783)), OLMo 2 / Tulu 3, Qwen3 ([arxiv 2505.09388](https://arxiv.org/abs/2505.09388)). These reports *are* the modern curriculum.
+
+---
+
+## Suggested 10-Week Sequence
+
+- **Wk 1-2:** Module 0-2 (nanochat plus Karpathy plus transformer internals). Build a working tiny GPT.
+- **Wk 3-4:** Module 3-5 (optimization, scaling laws, data). Read Chinchilla plus FineWeb plus DeepSeek-V3.
+- **Wk 5-6:** Module 6-7 (distributed plus MoE). Ultra-Scale Playbook.
+- **Wk 7-8:** Module 8-9 (SFT plus RLHF/GRPO). Run a LoRA SFT then a DPO.
+- **Wk 9-10:** Module 10-12 (inference, eval, frontier). Read one full tech report cover to cover.
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+// render markdown
+const md=document.getElementById("md").textContent;
+if(window.marked){document.getElementById("content").innerHTML=marked.parse(md);}
+else{
+  // fallback if CDN blocked: show raw text readably
+  const pre=document.createElement("pre");
+  pre.style.whiteSpace="pre-wrap";pre.style.fontFamily="var(--mono)";pre.style.fontSize="13px";
+  pre.textContent=md;document.getElementById("content").appendChild(pre);
+}
+
+// theme toggle
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  const isLight=document.documentElement.getAttribute("data-theme")==="light";
+  if(isLight){document.documentElement.removeAttribute("data-theme");localStorage.setItem("llm-theme","dark");}
+  else{document.documentElement.setAttribute("data-theme","light");localStorage.setItem("llm-theme","light");}
+});
+
+// back to top
+const bt=document.getElementById("backtop");
+addEventListener("scroll",()=>{bt.classList.toggle("show",scrollY>600)});
+</script>
+</body>
+</html>

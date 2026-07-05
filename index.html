@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM Mastery · 0 to 100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>if(localStorage.getItem("llm-theme")==="light")document.documentElement.setAttribute("data-theme","light");</script>
+<style>
+:root{
+  --bg:#05060a;
+  --card:rgba(255,255,255,0.035);
+  --card-border:rgba(255,255,255,0.09);
+  --text:#e8eaf2;
+  --text-strong:#ffffff;
+  --muted:#8a90a6;
+  --dim:#5a5f74;
+  --accent:#6d7cff;
+  --accent2:#b06dff;
+  --good:#3ddc97;
+  --hover:rgba(255,255,255,.045);
+  --track:rgba(255,255,255,.06);
+  --grid:rgba(255,255,255,.035);
+  --glow:rgba(109,124,255,.20);
+  --check-ink:#05060a;
+  --topbar:rgba(5,6,10,.72);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f5fa;
+  --card:rgba(255,255,255,0.72);
+  --card-border:rgba(18,20,34,0.10);
+  --text:#1e2230;
+  --text-strong:#0a0c14;
+  --muted:#565b6e;
+  --dim:#9095a5;
+  --hover:rgba(18,20,34,.05);
+  --track:rgba(18,20,34,.08);
+  --grid:rgba(18,20,34,.05);
+  --glow:rgba(109,124,255,.16);
+  --check-ink:#ffffff;
+  --topbar:rgba(244,245,250,.78);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  transition:background .45s,color .45s;
+}
+/* modern background: soft glow + fading grid */
+.bg{position:fixed;inset:0;z-index:-3;background:var(--bg);transition:background .45s}
+.bg-glow{position:fixed;inset:0;z-index:-2;pointer-events:none;transition:.45s;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -8%,var(--glow),transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 15%,rgba(176,109,255,.10),transparent 55%),
+    radial-gradient(ellipse 60% 50% at 12% 90%,rgba(61,220,151,.08),transparent 55%)}
+.bg-grid{position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%);
+  mask-image:radial-gradient(ellipse 115% 80% at 50% 0%,#000 22%,transparent 78%)}
+.grain{position:fixed;inset:0;z-index:-1;opacity:.03;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* sticky progress */
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);
+  background:var(--topbar);
+  border-bottom:1px solid var(--card-border);transition:background .45s,border-color .45s}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;gap:18px}
+.tb-nav{display:flex;gap:3px}
+.nav-link{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;
+  padding:7px 13px;border-radius:9px;transition:.2s;white-space:nowrap}
+.nav-link:hover{color:var(--text-strong);background:var(--hover)}
+.nav-link.active{color:var(--text-strong);background:var(--hover)}
+.icon-btn{width:36px;height:34px;flex:none;display:grid;place-items:center;cursor:pointer;
+  background:var(--card);border:1px solid var(--card-border);border-radius:9px;color:var(--muted);transition:.25s}
+.icon-btn:hover{color:var(--text-strong);border-color:var(--accent)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn .moon{display:none}
+[data-theme="light"] .icon-btn .sun{display:none}
+[data-theme="light"] .icon-btn .moon{display:block}
+.tb-title{font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:9px}
+.tb-star{width:22px;height:22px;flex:none}
+.progress-wrap{flex:1;display:flex;align-items:center;gap:14px}
+.bar{flex:1;height:9px;border-radius:20px;background:var(--track);overflow:hidden;position:relative}
+.bar-fill{height:100%;width:0%;border-radius:20px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2) 60%,var(--good));
+  box-shadow:0 0 18px rgba(109,124,255,.5);transition:width .8s cubic-bezier(.22,1,.36,1)}
+.pct{font-family:var(--mono);font-weight:600;font-size:14px;min-width:52px;text-align:right;
+  background:linear-gradient(90deg,var(--accent),var(--good));-webkit-background-clip:text;background-clip:text;color:transparent}
+.reset-btn{font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted);
+  background:var(--card);border:1px solid var(--card-border);padding:7px 13px;
+  border-radius:9px;cursor:pointer;transition:.25s;white-space:nowrap}
+.reset-btn:hover{color:var(--text-strong);border-color:var(--accent);background:rgba(109,124,255,.14)}
+
+/* hero */
+.hero{max-width:1180px;margin:0 auto;padding:90px 26px 40px;text-align:center}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--accent);font-weight:500;margin-bottom:22px;opacity:0;animation:rise .9s .1s forwards}
+h1{font-size:clamp(42px,8vw,88px);font-weight:900;letter-spacing:-.045em;line-height:.98;
+  background:linear-gradient(180deg,#fff 20%,#9aa0c0);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;animation:rise .9s .22s forwards}
+[data-theme="light"] h1{background:linear-gradient(180deg,#0a0c14 25%,#454b66);-webkit-background-clip:text;background-clip:text}
+.hero h1 span{background:linear-gradient(120deg,var(--accent),var(--accent2) 50%,var(--good));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{max-width:620px;margin:26px auto 0;color:var(--muted);font-size:18px;font-weight:400;
+  opacity:0;animation:rise .9s .34s forwards}
+.hero-stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:38px;
+  opacity:0;animation:rise .9s .46s forwards}
+.stat{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:15px 22px;backdrop-filter:blur(10px)}
+.stat-n{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em}
+.stat-l{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.eyebrow,h1,.sub,.hero-stats{transform:translateY(24px)}
+
+/* filter pills */
+.controls{max-width:1180px;margin:20px auto 0;padding:0 26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pill{font-size:13px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--card-border);
+  padding:9px 18px;border-radius:30px;cursor:pointer;transition:.25s}
+.pill:hover{color:var(--text-strong);border-color:var(--accent)}
+.pill.active{color:var(--text-strong);background:linear-gradient(120deg,rgba(109,124,255,.28),rgba(176,109,255,.24));border-color:var(--accent)}
+
+/* modules */
+.grid{max-width:1180px;margin:36px auto 90px;padding:0 26px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:22px}
+.mod{background:var(--card);border:1px solid var(--card-border);border-radius:20px;overflow:hidden;
+  backdrop-filter:blur(14px);position:relative;opacity:0;transform:translateY(34px) scale(.985);
+  transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .7s,border-color .3s,box-shadow .4s}
+.mod.reveal{opacity:1;transform:none}
+.mod::before{content:'';position:absolute;inset:0;border-radius:20px;padding:1px;pointer-events:none;
+  background:linear-gradient(140deg,var(--mc,#6d7cff),transparent 42%);opacity:0;transition:.4s;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.mod:hover{transform:translateY(-5px);box-shadow:0 24px 60px -20px rgba(0,0,0,.7)}
+[data-theme="light"] .mod:hover{box-shadow:0 22px 50px -24px rgba(18,20,34,.30)}
+.mod:hover::before{opacity:.9}
+.mod.done{border-color:rgba(61,220,151,.4)}
+.mod.done::after{content:'✓ COMPLETE';position:absolute;top:16px;right:16px;font-family:var(--mono);
+  font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--good);
+  background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.35);padding:4px 9px;border-radius:7px;z-index:3}
+
+.mod-head{padding:24px 24px 18px;cursor:pointer;display:flex;gap:16px;align-items:flex-start;position:relative}
+.mod-num{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;
+  width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center;
+  background:var(--mc-bg,rgba(109,124,255,.14));color:var(--mc,#6d7cff);border:1px solid var(--mc-br,rgba(109,124,255,.3))}
+.mod-titles{flex:1;min-width:0}
+.mod-title{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.mod-sub{font-size:13.5px;color:var(--muted);margin-top:4px}
+.mod-meta{display:flex;align-items:center;gap:10px;margin-top:14px}
+.mini-bar{flex:1;height:5px;border-radius:10px;background:var(--track);overflow:hidden}
+.mini-fill{height:100%;width:0;border-radius:10px;background:var(--mc,#6d7cff);transition:width .6s cubic-bezier(.22,1,.36,1)}
+.mini-count{font-family:var(--mono);font-size:11px;color:var(--dim);white-space:nowrap}
+.chev{transition:.4s;color:var(--dim);flex:none;margin-top:2px}
+.mod.open .chev{transform:rotate(180deg)}
+
+.mod-body{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.4,0,.2,1)}
+.mod-body-inner{padding:2px 24px 22px}
+.blurb{font-size:13.5px;color:var(--muted);border-left:2px solid var(--mc-br,rgba(109,124,255,.3));
+  padding:2px 0 2px 14px;margin-bottom:16px;font-style:italic}
+.item{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:12px;
+  transition:.2s;cursor:pointer;margin:0 -8px}
+.item:hover{background:var(--hover)}
+.cbox{width:20px;height:20px;flex:none;border-radius:6px;border:2px solid var(--dim);
+  margin-top:2px;position:relative;transition:.25s;display:grid;place-items:center}
+.cbox svg{width:12px;height:12px;stroke:var(--check-ink);stroke-width:3.5;fill:none;
+  stroke-dasharray:20;stroke-dashoffset:20;transition:.3s .05s}
+.item.checked .cbox{background:var(--good);border-color:var(--good);box-shadow:0 0 14px rgba(61,220,151,.5)}
+.item.checked .cbox svg{stroke-dashoffset:0}
+.item-body{flex:1;min-width:0}
+.item-title{font-size:14.5px;font-weight:600;line-height:1.4;transition:.25s}
+.item.checked .item-title{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(61,220,151,.5)}
+.item-note{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.item-links{margin-top:7px;display:flex;flex-wrap:wrap;gap:7px}
+.lnk{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--mc,#8fa0ff);
+  background:var(--mc-bg,rgba(109,124,255,.1));border:1px solid var(--mc-br,rgba(109,124,255,.22));
+  padding:4px 9px;border-radius:7px;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:5px}
+.lnk:hover{background:var(--mc,#6d7cff);color:#05060a;border-color:var(--mc,#6d7cff)}
+.lex{margin-top:18px;padding-top:16px;border-top:1px dashed var(--card-border)}
+.lex-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.lex-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--hover);
+  border:1px solid var(--card-border);padding:3px 8px;border-radius:6px;transition:.2s}
+.tag:hover{color:var(--text-strong);border-color:var(--mc,#6d7cff);background:var(--mc-bg,rgba(109,124,255,.12))}
+
+/* footer */
+.foot{text-align:center;padding:40px 26px 70px;color:var(--dim);font-size:13px}
+.foot a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--dim)}
+
+/* confetti canvas */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
+
+/* celebration toast */
+.toast{position:fixed;left:50%;bottom:40px;transform:translate(-50%,140%);z-index:200;
+  background:linear-gradient(120deg,rgba(61,220,151,.16),rgba(109,124,255,.16));
+  border:1px solid rgba(61,220,151,.4);backdrop-filter:blur(16px);
+  padding:16px 26px;border-radius:16px;font-weight:700;display:flex;align-items:center;gap:12px;
+  transition:transform .6s cubic-bezier(.22,1.4,.36,1);box-shadow:0 20px 60px -15px rgba(61,220,151,.4)}
+.toast.show{transform:translate(-50%,0)}
+.toast .emoji{font-size:24px}
+
+@media(max-width:760px){
+  .tb-nav{display:none}
+}
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr;padding:0 16px}
+  .tb-title span.full{display:none}
+  .topbar-inner{padding:12px 16px;gap:10px}
+  .hero{padding:64px 18px 30px}
+  .reset-btn{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+<div class="grain"></div>
+<canvas id="confetti"></canvas>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="tb-title">
+      <svg class="tb-star" viewBox="0 0 24 24" fill="url(#g)"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d7cff"/><stop offset="1" stop-color="#b06dff"/></linearGradient></defs><path d="M12 2l2.9 6.9L22 9.6l-5.3 4.7L18.2 22 12 18.2 5.8 22l1.5-7.7L2 9.6l7.1-.7z"/></svg>
+      <span class="full">LLM Mastery</span>
+    </div>
+    <nav class="tb-nav">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="doc.html" class="nav-link">Doc</a>
+    </nav>
+    <div class="progress-wrap">
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      <div class="pct" id="pctText">0%</div>
+    </div>
+    <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+    </button>
+    <button class="reset-btn" id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">The 0 to 100 Curriculum</div>
+  <h1>Train an LLM<br><span>from scratch.</span></h1>
+  <p class="sub">Every module, paper, and tit-bit the modern lexicon demands. Read, check, and watch your mastery bar fill. Progress saves automatically.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-n" id="sMods">13</div><div class="stat-l">Modules</div></div>
+    <div class="stat"><div class="stat-n" id="sItems">0</div><div class="stat-l">Resources</div></div>
+    <div class="stat"><div class="stat-n" id="sLex">0</div><div class="stat-l">Keywords</div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="pill active" data-filter="all">All modules</button>
+  <button class="pill" data-filter="unread">Unfinished</button>
+  <button class="pill" data-filter="done">Completed</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="foot">
+  Progress stored locally in your browser ·
+  <a href="doc.html">read the full curriculum</a> ·
+  <a href="https://github.com/karpathy/nanochat" target="_blank" rel="noopener">start with nanochat</a>
+</div>
+
+<div class="toast" id="toast"><span class="emoji">🎓</span><span id="toastText">Module complete</span></div>
+
+<script>
+const MODULES=[
+{n:"0",t:"Orientation & Mental Model",s:"The pipeline before the math",c:"#6d7cff",
+ blurb:"Every LLM is: tokenize → pretrain → mid-train → post-train → align → evaluate → serve. Internalize the skeleton first; everything else hangs off it.",
+ items:[
+  {t:"nanochat (Karpathy) - full stack in ~8K lines",note:"THE reference implementation. Tokenizer → pretrain → SFT → RL → eval → web UI for ~$100 on 8xH100. Clone it, read every file, run the speedrun.",links:[["GitHub","https://github.com/karpathy/nanochat"]]},
+  {t:"Neural Networks: Zero to Hero",note:"Watch 'Let's build GPT' and 'Let's build the GPT Tokenizer' with the code open.",links:[["Course","https://karpathy.ai/zero-to-hero.html"]]},
+  {t:"nanollama - raw text to GGUF in one command",note:"2026 spinoff showing a modern Llama-style stack end to end.",links:[["Discussion","https://github.com/karpathy/nanochat/discussions/557"]]},
+ ],
+ lex:["autoregressive","causal LM","next-token prediction","teacher forcing","cross-entropy","perplexity","bits-per-byte","context length","base vs instruct","foundation model","pretraining","post-training"]},
+
+{n:"1",t:"Tokenization",s:"The part everyone underrates",c:"#7d6dff",
+ blurb:"Tokenization silently determines math ability, multilingual fairness, and effective context. Normal people skip this. Do not.",
+ items:[
+  {t:"Let's build the GPT Tokenizer + minbpe",note:"Karpathy's video plus his minimal BPE repo.",links:[["Video","https://www.youtube.com/watch?v=zduSFxRajkE"],["minbpe","https://github.com/karpathy/minbpe"]]},
+  {t:"Neural Machine Translation of Rare Words with Subword Units",note:"Sennrich et al. 2016 - the original BPE idea.",links:[["arXiv 1508.07909","https://arxiv.org/abs/1508.07909"]]},
+  {t:"SentencePiece + Unigram LM tokenizer",note:"Kudo & Richardson 2018. Unigram is different from BPE and used by T5/Gemma.",links:[["arXiv 1808.06226","https://arxiv.org/abs/1808.06226"]]},
+  {t:"HuggingFace tokenizers library",note:"Production BBPE tooling.",links:[["GitHub","https://github.com/huggingface/tokenizers"]]},
+ ],
+ lex:["subword","merge rules","BPE","BBPE","WordPiece","Unigram LM","SentencePiece","pretokenizer regex","fertility","OOV","special tokens","chat template","glitch tokens","digit tokenization","tokenizer-free / BLT"]},
+
+{n:"2",t:"The Transformer, Modern Edition",s:"Not the 2017 vanilla one",c:"#9d6dff",
+ blurb:"The modern default stack: pre-norm + RMSNorm, RoPE, SwiGLU, GQA, FlashAttention. Learn it directly, not the archaic version.",
+ items:[
+  {t:"Attention Is All You Need",note:"Vaswani et al. 2017. Pair with The Illustrated Transformer + The Annotated Transformer.",links:[["arXiv 1706.03762","https://arxiv.org/abs/1706.03762"]]},
+  {t:"Crystallization of Transformer Architectures (2017-2025)",note:"Excellent survey of what converged and why.",links:[["Blog","https://jytan.net/blog/2025/transformer-architectures/"]]},
+  {t:"RMSNorm - Root Mean Square Layer Normalization",note:"Zhang & Sennrich 2019. Why pre-norm gives gradient stability at depth.",links:[["arXiv 1910.07467","https://arxiv.org/abs/1910.07467"]]},
+  {t:"RoFormer / RoPE",note:"Su et al. Rotation encodes relative position and enables YaRN context extension.",links:[["arXiv 2104.09864","https://arxiv.org/abs/2104.09864"],["YaRN","https://arxiv.org/abs/2309.00071"]]},
+  {t:"GLU Variants Improve Transformer (SwiGLU)",note:"Shazeer 2020. Note the 2/3 hidden-dim trick to match params.",links:[["arXiv 2002.05202","https://arxiv.org/abs/2002.05202"]]},
+  {t:"GQA - Grouped-Query Attention",note:"Ainslie et al. KV-cache memory play, generalizing MQA. Critical for inference.",links:[["arXiv 2305.13245","https://arxiv.org/abs/2305.13245"]]},
+  {t:"FlashAttention 1/2/3",note:"Dao et al. IO-awareness: it's about HBM<->SRAM traffic, not FLOPs.",links:[["arXiv 2205.14135","https://arxiv.org/abs/2205.14135"]]},
+ ],
+ lex:["pre-norm/post-norm","residual stream","attention head","Q/K/V","causal mask","RoPE","ALiBi","NoPE","YaRN","KV cache","MHA/MQA/GQA/MLA","IO-aware","SRAM/HBM","tied embeddings","logit","QK-norm","logit soft-capping","sliding-window","attention sinks"]},
+
+{n:"3",t:"Training Dynamics & Optimization",s:"Where models go to die",c:"#c06dff",
+ blurb:"Loss spikes, learning-rate schedules, and how labs keep billion-param runs alive. muP is the tit-bit normal people miss.",
+ items:[
+  {t:"Decoupled Weight Decay Regularization (AdamW)",note:"Loshchilov & Hutter. Still the default optimizer.",links:[["arXiv 1711.05101","https://arxiv.org/abs/1711.05101"]]},
+  {t:"muP / muTransfer (Tensor Programs V)",note:"Tune hyperparameters on a tiny model, transfer to the big one. Used by real labs.",links:[["arXiv 2203.03466","https://arxiv.org/abs/2203.03466"]]},
+  {t:"An Empirical Model of Large-Batch Training",note:"McCandlish et al. Critical batch size and gradient noise scale.",links:[["arXiv 1812.06162","https://arxiv.org/abs/1812.06162"]]},
+  {t:"Muon optimizer + WSD schedules",note:"Modern optimizers (Lion, Sophia, Adam-mini, Muon, SOAP) and Warmup-Stable-Decay eating cosine's lunch.",links:[["Muon","https://kellerjordan.github.io/posts/muon/"]]},
+ ],
+ lex:["AdamW","weight decay","warmup","cosine/WSD schedule","LR annealing","gradient clipping","grad norm","loss spike","z-loss","muP/muTransfer","coordinate check","critical batch size","gradient accumulation","EMA","bf16/fp8","loss scaling","optimizer states"]},
+
+{n:"4",t:"Scaling Laws & Compute-Optimality",s:"The intellectual core",c:"#dd6dd0",
+ blurb:"How labs decide how big a model to train and on how much data. Memorize C ≈ 6ND.",
+ items:[
+  {t:"Scaling Laws for Neural Language Models",note:"Kaplan et al. 2020. The original power laws.",links:[["arXiv 2001.08361","https://arxiv.org/abs/2001.08361"]]},
+  {t:"Training Compute-Optimal LLMs (Chinchilla)",note:"Hoffmann et al. The ~20 tokens/param rule that corrected Kaplan.",links:[["arXiv 2203.15556","https://arxiv.org/abs/2203.15556"],["Explainer","https://lifearchitect.ai/chinchilla/"]]},
+  {t:"Scaling Data-Constrained Language Models",note:"Muennighoff et al. ~4 epochs ≈ fresh data, then diminishing returns.",links:[["arXiv 2305.16264","https://arxiv.org/abs/2305.16264"]]},
+  {t:"Beyond Chinchilla-Optimal (inference-adjusted)",note:"Why deployed models are over-trained (smaller, more tokens). LFM2.5-350M hit 80,000:1.",links:[["Analysis","https://medium.com/@advaitss11/llm-scaling-laws-and-their-relevance-in-2026-b7928e732b6d"]]},
+ ],
+ lex:["power law","compute-optimal","isoFLOP","6ND","tokens-per-parameter","over-training","irreducible loss","scaling exponent","emergent abilities","grokking","double descent","inference-adjusted scaling"]},
+
+{n:"5",t:"Data: Curation, Dedup, Mixtures",s:"The real moat",c:"#ff6db6",
+ blurb:"Frontier quality is 80% data. Least glamorous, most important. Mid-training / annealing is the phase most tutorials miss.",
+ items:[
+  {t:"RefinedWeb",note:"Web data alone, filtered well, beats curated corpora.",links:[["arXiv 2306.01116","https://arxiv.org/abs/2306.01116"]]},
+  {t:"FineWeb & FineWeb-Edu blog",note:"A full data-engineering masterclass. Read it slowly.",links:[["Blog","https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1"]]},
+  {t:"DoReMi - Domain Reweighting with Minimax Optimization",note:"Learn data mixture weights with a small proxy model.",links:[["arXiv 2305.10429","https://arxiv.org/abs/2305.10429"]]},
+  {t:"Rephrasing the Web (WRAP)",note:"Synthetic / rephrased data. Pair with the Phi 'textbooks are all you need' line.",links:[["arXiv 2401.16380","https://arxiv.org/abs/2401.16380"]]},
+ ],
+ lex:["corpus","dedup (MinHash/LSH)","quality classifier","perplexity filter","DSIR","DoReMi","data mixture","domain weights","upsampling","decontamination","n-gram overlap","synthetic data","annealing/cooldown/mid-training","curriculum","replay","catastrophic forgetting","token budget"]},
+
+{n:"6",t:"Distributed Training & Systems",s:"The memory wall",c:"#ff7d6d",
+ blurb:"Parallelism, the roofline model, and MFU - the one number labs quote for training efficiency.",
+ items:[
+  {t:"Megatron-LM (tensor parallelism)",note:"Shoeybi et al. 2019.",links:[["arXiv 1909.08053","https://arxiv.org/abs/1909.08053"]]},
+  {t:"ZeRO / DeepSpeed",note:"Rajbhandari et al. Stages 1/2/3 sharding. FSDP is the PyTorch-native equivalent.",links:[["arXiv 1910.02054","https://arxiv.org/abs/1910.02054"]]},
+  {t:"Ring Attention (sequence/context parallel)",note:"For long context training.",links:[["arXiv 2310.01889","https://arxiv.org/abs/2310.01889"]]},
+  {t:"The Ultra-Scale Playbook",note:"HuggingFace 2025. Outstanding modern systems read. Pair with Google's 'How to Scale Your Model'.",links:[["Playbook","https://huggingface.co/spaces/nanotron/ultrascale-playbook"]]},
+ ],
+ lex:["DP/TP/PP/EP/SP/CP","3D/4D parallelism","ZeRO-1/2/3","FSDP","sharding","all-reduce/all-gather","NCCL","pipeline bubble","1F1B","micro-batch","activation checkpointing","rematerialization","offloading","MFU/HFU","arithmetic intensity","roofline","NVLink/InfiniBand"]},
+
+{n:"7",t:"Mixture-of-Experts",s:"Near-mandatory in 2026",c:"#ffa06d",
+ blurb:"Every frontier model (DeepSeek-V3, Mixtral, Qwen3, Llama 4, GPT-oss) is MoE now. Active vs total params is the key intuition.",
+ items:[
+  {t:"Switch Transformer",note:"Fedus et al. 2021. Pair with GShard.",links:[["arXiv 2101.03961","https://arxiv.org/abs/2101.03961"]]},
+  {t:"Mixtral of Experts",note:"2024. Clean, readable sparse MoE.",links:[["arXiv 2401.04088","https://arxiv.org/abs/2401.04088"]]},
+  {t:"DeepSeek-V3 Technical Report",note:"The most important single report of the era. Fine-grained + shared experts, aux-loss-free balancing, MLA, FP8. Read it twice.",links:[["arXiv 2412.19437","https://arxiv.org/abs/2412.19437"]]},
+ ],
+ lex:["sparse MoE","router/gating","top-k routing","active params","shared/fine-grained experts","load-balancing loss","aux-loss-free balancing","expert collapse","router z-loss","capacity factor","token dropping","expert parallel","upcycling"]},
+
+{n:"8",t:"Post-Training I: SFT",s:"Base model to assistant",c:"#ffc46d",
+ blurb:"Instruction tuning, chat templates, loss masking, and PEFT. Quality beats quantity - LIMA showed 1K great examples.",
+ items:[
+  {t:"InstructGPT",note:"Ouyang et al. The SFT→RM→PPO recipe that made ChatGPT. Required reading.",links:[["arXiv 2203.02155","https://arxiv.org/abs/2203.02155"]]},
+  {t:"Self-Instruct",note:"Bootstrapping instruction data. Pair with Alpaca.",links:[["arXiv 2212.10560","https://arxiv.org/abs/2212.10560"]]},
+  {t:"Tulu 3 (AllenAI)",note:"The best open, fully-documented post-training recipe.",links:[["arXiv 2411.15124","https://arxiv.org/abs/2411.15124"]]},
+  {t:"LoRA + QLoRA",note:"Parameter-efficient finetuning (PEFT).",links:[["LoRA","https://arxiv.org/abs/2106.09685"],["QLoRA","https://arxiv.org/abs/2305.14314"]]},
+ ],
+ lex:["SFT","instruction tuning","chat template","system prompt","loss masking","completion-only loss","sequence packing","LoRA/QLoRA/DoRA","PEFT","adapters","LIMA","alignment tax"]},
+
+{n:"9",t:"Post-Training II: RLHF, DPO & RLVR",s:"The reasoning-model era",c:"#e8d96d",
+ blurb:"PPO → DPO → verifiable-reward RL. GRPO + RLVR (DeepSeek-R1) changed the field. KL-to-reference is the master knob.",
+ items:[
+  {t:"PPO - Proximal Policy Optimization",note:"Schulman et al. Reward model, KL penalty, value head, GAE, reward hacking.",links:[["arXiv 1707.06347","https://arxiv.org/abs/1707.06347"]]},
+  {t:"DPO - Direct Preference Optimization",note:"Rafailov et al. RLHF without a separate RL loop. Then the zoo: IPO, KTO, ORPO, SimPO.",links:[["arXiv 2305.18290","https://arxiv.org/abs/2305.18290"]]},
+  {t:"Constitutional AI / RLAIF",note:"Anthropic. AI feedback instead of human labels.",links:[["arXiv 2212.08073","https://arxiv.org/abs/2212.08073"]]},
+  {t:"DeepSeek-R1 (GRPO + RLVR)",note:"Must-read. R1-Zero: pure RL, no SFT, emergent chain-of-thought. GRPO drops the value network.",links:[["arXiv 2501.12948","https://arxiv.org/abs/2501.12948"]]},
+ ],
+ lex:["RLHF","reward model","Bradley-Terry","PPO","GAE","KL penalty","reference policy","DPO/IPO/KTO/ORPO/SimPO","RLAIF","GRPO","RLVR","verifier","PRM/ORM","rejection sampling","STaR","best-of-N","reward hacking","over-optimization","entropy collapse","rollout","advantage"]},
+
+{n:"10",t:"Long Context, Inference & Serving",s:"Serve it cheaply",c:"#a0e86d",
+ blurb:"Training isn't done until it serves. Quantization, speculative decoding, PagedAttention, and TTFT vs TPOT.",
+ items:[
+  {t:"vLLM + PagedAttention",note:"Continuous batching, prefix caching, chunked prefill.",links:[["Paper","https://arxiv.org/abs/2309.06180"]]},
+  {t:"Quantization: GPTQ / AWQ / SmoothQuant",note:"PTQ vs QAT, GGUF/llama.cpp, NF4, FP8/INT4 inference.",links:[["GPTQ","https://arxiv.org/abs/2210.17323"],["AWQ","https://arxiv.org/abs/2306.00978"]]},
+  {t:"Speculative decoding + Medusa / EAGLE",note:"Draft model accelerates decode without changing outputs.",links:[["Spec decode","https://arxiv.org/abs/2211.17192"]]},
+  {t:"Distilling the Knowledge in a Neural Network",note:"Hinton et al. Plus on-policy distillation (2025) for small strong models.",links:[["arXiv 1503.02531","https://arxiv.org/abs/1503.02531"]]},
+ ],
+ lex:["prefill vs decode","TTFT/TPOT/ITL","continuous batching","PagedAttention","speculative decoding","draft model","Medusa/EAGLE","GPTQ/AWQ/GGUF/NF4","PTQ/QAT","throughput vs latency","prefix caching","needle-in-a-haystack","RULER","distillation"]},
+
+{n:"11",t:"Evaluation",s:"Where credibility is won or lost",c:"#6de8a0",
+ blurb:"Prompt-format sensitivity can swing MMLU 5-10 points. Contamination inflates everything. You'll feel at home here.",
+ items:[
+  {t:"lm-evaluation-harness",note:"The de facto eval tool. MMLU, GPQA, GSM8K, MATH, HumanEval, IFEval, BBH.",links:[["GitHub","https://github.com/EleutherAI/lm-evaluation-harness"]]},
+  {t:"HELM - Holistic Evaluation of Language Models",note:"Stanford's multi-metric framework.",links:[["arXiv 2211.09110","https://arxiv.org/abs/2211.09110"]]},
+  {t:"Judging LLM-as-a-Judge (MT-Bench + Chatbot Arena)",note:"Zheng et al. Elo ranking plus judge biases (position, verbosity, self-preference).",links:[["arXiv 2306.05685","https://arxiv.org/abs/2306.05685"]]},
+  {t:"Are Emergent Abilities a Mirage?",note:"Schaeffer et al. The metric-choice critique of emergence.",links:[["arXiv 2304.15004","https://arxiv.org/abs/2304.15004"]]},
+ ],
+ lex:["zero/few-shot","in-context learning","CoT prompting","self-consistency","pass@k","log-likelihood vs generative eval","contamination","saturation","Elo","LLM-as-judge","IFEval","elicitation gap","held-out"]},
+
+{n:"12",t:"Interpretability, Safety & Frontier",s:"Read any 2026 paper",c:"#6dc4ff",
+ blurb:"Round out the vocabulary: mech interp, safety failure modes, and the emerging architectures worth name-dropping correctly.",
+ items:[
+  {t:"Toward / Scaling Monosemanticity (Anthropic)",note:"Sparse autoencoders, features vs neurons, superposition, induction heads.",links:[["Article","https://transformer-circuits.pub/2024/scaling-monosemanticity/"]]},
+  {t:"Mamba - Linear-Time Sequence Modeling with SSMs",note:"State-space models, linear attention, hybrid (Jamba, Zamba) architectures.",links:[["arXiv 2312.00752","https://arxiv.org/abs/2312.00752"]]},
+  {t:"Byte Latent Transformer (BLT)",note:"Meta 2024. Tokenizer-free, byte-level, dynamic patching.",links:[["arXiv 2412.09871","https://arxiv.org/abs/2412.09871"]]},
+  {t:"Read one full tech report cover to cover",note:"Llama 3 (the 92-page one), DeepSeek-V3, OLMo 2/Tulu 3, or Qwen3. These reports ARE the modern curriculum.",links:[["Llama 3","https://arxiv.org/abs/2407.21783"],["Qwen3","https://arxiv.org/abs/2505.09388"]]},
+ ],
+ lex:["residual stream","induction heads","superposition","sparse autoencoders","monosemanticity","jailbreak","red-teaming","sycophancy","deceptive alignment","sandbagging","unlearning","Mamba/SSM","linear attention","hybrid models","diffusion LM","test-time compute","latent reasoning"]},
+];
+
+const KEY="llm-curriculum-progress-v1";
+let state=JSON.parse(localStorage.getItem(KEY)||"{}");
+const grid=document.getElementById("grid");
+let totalItems=0,totalLex=0;
+
+function idFor(m,i){return "m"+m.n+"i"+i}
+
+MODULES.forEach(m=>{
+  totalItems+=m.items.length; totalLex+=m.lex.length;
+  const card=document.createElement("div");
+  card.className="mod"; card.dataset.mod=m.n;
+  card.style.setProperty("--mc",m.c);
+  card.style.setProperty("--mc-bg",hex(m.c,.13));
+  card.style.setProperty("--mc-br",hex(m.c,.32));
+  card.innerHTML=`
+   <div class="mod-head">
+     <div class="mod-num">${m.n}</div>
+     <div class="mod-titles">
+       <div class="mod-title">${m.t}</div>
+       <div class="mod-sub">${m.s}</div>
+       <div class="mod-meta">
+         <div class="mini-bar"><div class="mini-fill"></div></div>
+         <div class="mini-count"></div>
+       </div>
+     </div>
+     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+   </div>
+   <div class="mod-body"><div class="mod-body-inner">
+     <div class="blurb">${m.blurb}</div>
+     <div class="items">
+       ${m.items.map((it,i)=>`
+         <div class="item" data-id="${idFor(m,i)}">
+           <div class="cbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+           <div class="item-body">
+             <div class="item-title">${it.t}</div>
+             ${it.note?`<div class="item-note">${it.note}</div>`:""}
+             ${it.links?`<div class="item-links">${it.links.map(l=>`<a class="lnk" href="${l[1]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${l[0]}</a>`).join("")}</div>`:""}
+           </div>
+         </div>`).join("")}
+     </div>
+     <div class="lex">
+       <div class="lex-h">Lexicon · speak like a researcher</div>
+       <div class="lex-tags">${m.lex.map(x=>`<span class="tag">${x}</span>`).join("")}</div>
+     </div>
+   </div></div>`;
+  grid.appendChild(card);
+
+  // expand/collapse
+  const head=card.querySelector(".mod-head");
+  const body=card.querySelector(".mod-body");
+  head.addEventListener("click",()=>{
+    const open=card.classList.toggle("open");
+    body.style.maxHeight=open?body.scrollHeight+"px":"0";
+  });
+
+  // item toggles
+  card.querySelectorAll(".item").forEach(el=>{
+    const id=el.dataset.id;
+    if(state[id]) el.classList.add("checked");
+    el.addEventListener("click",()=>{
+      el.classList.toggle("checked");
+      state[id]=el.classList.contains("checked");
+      save(); updateModule(card,m); updateGlobal();
+      if(body.style.maxHeight&&body.style.maxHeight!=="0px") body.style.maxHeight=body.scrollHeight+"px";
+    });
+  });
+  updateModule(card,m,true);
+});
+
+document.getElementById("sItems").textContent=totalItems;
+document.getElementById("sLex").textContent=totalLex;
+
+function updateModule(card,m,silent){
+  const total=m.items.length;
+  let done=0; m.items.forEach((_,i)=>{if(state[idFor(m,i)])done++});
+  const pct=total?done/total*100:0;
+  card.querySelector(".mini-fill").style.width=pct+"%";
+  card.querySelector(".mini-count").textContent=done+"/"+total;
+  const wasDone=card.classList.contains("done");
+  const nowDone=done===total&&total>0;
+  card.classList.toggle("done",nowDone);
+  if(nowDone&&!wasDone&&!silent){ celebrate("Module "+m.n+" complete — "+m.t); }
+}
+
+function updateGlobal(){
+  let done=0; Object.values(state).forEach(v=>{if(v)done++});
+  const pct=Math.round(done/totalItems*100);
+  document.getElementById("barFill").style.width=pct+"%";
+  document.getElementById("pctText").textContent=pct+"%";
+  if(pct===100){ celebrate("🎓 You finished the entire curriculum. Go train one.",true); }
+}
+updateGlobal();
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+
+// filters
+document.querySelectorAll(".pill").forEach(p=>{
+  p.addEventListener("click",()=>{
+    document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+    p.classList.add("active");
+    const f=p.dataset.filter;
+    document.querySelectorAll(".mod").forEach(c=>{
+      const done=c.classList.contains("done");
+      c.style.display=(f==="all"||(f==="done"&&done)||(f==="unread"&&!done))?"":"none";
+    });
+  });
+});
+
+// reset
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(!confirm("Reset all reading progress? This cannot be undone.")) return;
+  state={}; save();
+  document.querySelectorAll(".item").forEach(el=>el.classList.remove("checked"));
+  MODULES.forEach((m,idx)=>updateModule(grid.children[idx],m,true));
+  updateGlobal();
+});
+
+// scroll reveal
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add("reveal"),parseInt(e.target.dataset.mod)*40);io.unobserve(e.target)}});
+},{threshold:.12});
+document.querySelectorAll(".mod").forEach(m=>io.observe(m));
+
+// helpers
+function hex(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+
+// celebration
+const toast=document.getElementById("toast"),toastText=document.getElementById("toastText");
+let toastTimer;
+function celebrate(msg,big){
+  toastText.textContent=msg; toast.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove("show"),3200);
+  fireConfetti(big?220:90);
+}
+
+// lightweight confetti
+const cv=document.getElementById("confetti"),cx=cv.getContext("2d");
+let parts=[];
+function resize(){cv.width=innerWidth;cv.height=innerHeight}resize();addEventListener("resize",resize);
+function fireConfetti(n){
+  const cols=["#6d7cff","#b06dff","#3ddc97","#ff6db6","#ffc46d"];
+  for(let i=0;i<n;i++)parts.push({x:innerWidth/2,y:innerHeight*.35,
+    vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,g:.32,
+    s:Math.random()*7+3,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:1});
+  if(!raf)loop();
+}
+let raf=0;
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life-=.008;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.globalAlpha=Math.max(p.life,0);
+    cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);cx.restore();});
+  parts=parts.filter(p=>p.life>0&&p.y<cv.height+40);
+  if(parts.length)raf=requestAnimationFrame(loop);else{raf=0;cx.clearRect(0,0,cv.width,cv.height)}
+}
+
+// theme toggle
+const themeBtn=document.getElementById("themeBtn");
+themeBtn.addEventListener("click",()=>{
+  const isLight=document.documentElement.getAttribute("data-theme")==="light";
+  if(isLight){document.documentElement.removeAttribute("data-theme");localStorage.setItem("llm-theme","dark");}
+  else{document.documentElement.setAttribute("data-theme","light");localStorage.setItem("llm-theme","light");}
+  // keep any open cards sized correctly after style transition
+  document.querySelectorAll(".mod.open .mod-body").forEach(b=>b.style.maxHeight=b.scrollHeight+"px");
+});
+</script>
+</body>
+</html>
