@@ -6,7 +6,7 @@
 <title>LLM Mastery · 0 to 100</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
 <script>if(localStorage.getItem("llm-theme")==="light")document.documentElement.setAttribute("data-theme","light");</script>
 <style>
 :root{
@@ -87,8 +87,11 @@ body{
 .icon-btn .moon{display:none}
 [data-theme="light"] .icon-btn .sun{display:none}
 [data-theme="light"] .icon-btn .moon{display:block}
-.tb-title{font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:9px}
-.tb-star{width:22px;height:22px;flex:none}
+.tb-title{display:flex;align-items:center;text-decoration:none}
+.brand{font-family:'Space Grotesk',var(--font);font-weight:700;font-size:20px;letter-spacing:-.03em;white-space:nowrap;
+  background:linear-gradient(115deg,var(--accent),var(--accent2) 52%,var(--good));
+  -webkit-background-clip:text;background-clip:text;color:transparent;transition:opacity .2s}
+a.tb-title:hover .brand{opacity:.82}
 .progress-wrap{flex:1;display:flex;align-items:center;gap:14px}
 .bar{flex:1;height:9px;border-radius:20px;background:var(--track);overflow:hidden;position:relative}
 .bar-fill{height:100%;width:0%;border-radius:20px;
@@ -217,7 +220,7 @@ h1{font-size:clamp(42px,8vw,88px);font-weight:900;letter-spacing:-.045em;line-he
 }
 @media(max-width:640px){
   .grid{grid-template-columns:1fr;padding:0 16px}
-  .tb-title span.full{display:none}
+  .brand{font-size:17px}
   .topbar-inner{padding:12px 16px;gap:10px}
   .hero{padding:64px 18px 30px}
   .reset-btn{display:none}
@@ -233,10 +236,7 @@ h1{font-size:clamp(42px,8vw,88px);font-weight:900;letter-spacing:-.045em;line-he
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="tb-title">
-      <svg class="tb-star" viewBox="0 0 24 24" fill="url(#g)"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d7cff"/><stop offset="1" stop-color="#b06dff"/></linearGradient></defs><path d="M12 2l2.9 6.9L22 9.6l-5.3 4.7L18.2 22 12 18.2 5.8 22l1.5-7.7L2 9.6l7.1-.7z"/></svg>
-      <span class="full">LLM Mastery</span>
-    </div>
+    <a href="index.html" class="tb-title"><span class="brand">The Agent Stack</span></a>
     <nav class="tb-nav">
       <a href="index.html" class="nav-link active">Home</a>
       <a href="doc.html" class="nav-link">Doc</a>
